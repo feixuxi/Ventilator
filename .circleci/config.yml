@@ -55,7 +55,7 @@ jobs:
             git reset --soft $merge_base
             pre-commit run --show-diff-on-failure --files $changed_files
 
-  gui-static-analysis:
+  common-static-analysis:
     machine:
       resource_class: 2xlarge
       image: ubuntu-1604:201903-01
@@ -71,6 +71,8 @@ jobs:
           name: Run cppcheck on /software/gui
           command: |
             cd ~/project/software/gui && cppcheck -ithird_party . --error-exitcode=1 && cd -
+            cd ~/project/software/common && cppcheck . --error-exitcode=1 && cd -
+            cd ~/project/software/controller && cppcheck . --error-exitcode=1 && cd -
 
   controller-tests:
     # See https://circleci.com/docs/2.0/executor-types/#docker-benefits-and-limitations
@@ -106,8 +108,9 @@ jobs:
       - run:
           name: Run tests & publish coverage
           command: |
-            ci_env=`/bin/bash <(curl -s https://codecov.io/env)`
-            docker run $ci_env --privileged -t gui-test-image
+            cd ~/project/common && cppcheck . --error-exitcode=1 && cd -
+            cd ~/project/controller && cppcheck . --error-exitcode=1 && cd -
+            cd ~/project/gui && cppcheck . --error-exitcode=1 && cd -
 
   gui-build-image:
     machine:
