@@ -192,35 +192,6 @@ public:
   // Sets `pin` to high or low.
   void digitalWrite(BinaryPin pin, VoltageLevel value);
 
-  // Receives bytes from the GUI controller along the serial bus.
-  //
-  // Arduino's SerialIO will block if len > serialBytesAvailableForRead(), but
-  // this function will never block. Instead it returns the number of bytes
-  // read.  It's up to you to check how many bytes were actually read and
-  // handle "short reads" where we read fewer bytes than were requested.
-  //
-  // TODO(jlebar): Change the serial* functions to use uint32_t once we've
-  // dropped support for Arduino.
-  [[nodiscard]] uint16_t serialRead(char *buf, uint16_t len);
-
-  // Number of bytes we can read without blocking.
-  uint16_t serialBytesAvailableForRead();
-
-  // Sends bytes to the GUI controller along the serial bus.
-  //
-  // Arduino's SerialIO will block if len > serialBytesAvailableForWrite(), but
-  // this function will never block.  Instead, it returns the number of bytes
-  // written.  number of bytes written.  It's up to you to check how many bytes
-  // were actually written and handle "short writes" where we wrote less than
-  // the whole buffer.
-  [[nodiscard]] uint16_t serialWrite(const char *buf, uint16_t len);
-  [[nodiscard]] uint16_t serialWrite(uint8_t data) {
-    return serialWrite(reinterpret_cast<const char *>(&data), 1);
-  }
-
-  // Number of bytes we can write without blocking.
-  uint16_t serialBytesAvailableForWrite();
-
   // Serial port used for debugging
   [[nodiscard]] uint16_t debugWrite(const char *buf, uint16_t len);
   [[nodiscard]] uint16_t debugRead(char *buf, uint16_t len);
@@ -304,24 +275,12 @@ public:
   // Return true if we are currently executing in an interrupt handler
   bool InInterruptHandler();
 
-  // Calculate CRC32 for data buffer
-  uint32_t crc32(uint8_t *data, uint32_t length);
-
 private:
   // Initializes watchdog, sets appropriate pins to OUTPUT, etc.  Called by
   // HalApi::init
   void watchdog_init();
 
 #ifdef BARE_STM32
-  // Initializes CRC32 peripheral
-  void crc32_init();
-  // Reset the hardware peripheral in STM32
-  void crc32_reset();
-  // Accumulate CRC32 in STM32 hardware
-  void crc32_accumulate(uint8_t d);
-  // Get CRC32 accumulated in STM32 hardware
-  uint32_t crc32_get();
-
   void InitGPIO();
   void InitADC();
   void InitSysTimer();
@@ -442,52 +401,10 @@ inline void HalApi::analogWrite(PwmPin pin, float duty) {
   pwm_pin_values_[pin] = duty;
 }
 
-inline uint16_t HalApi::serialRead(char *buf, uint16_t len) {
-  return serial_port_.Read(buf, len);
-}
-inline uint16_t HalApi::serialBytesAvailableForRead() {
-  return serial_port_.BytesAvailableForRead();
-}
-inline uint16_t HalApi::serialWrite(const char *buf, uint16_t len) {
-  return serial_port_.Write(buf, len);
-}
-inline uint16_t HalApi::serialBytesAvailableForWrite() {
-  return serial_port_.BytesAvailableForWrite();
-}
-inline uint16_t HalApi::test_serialGetOutgoingData(char *data, uint16_t len) {
-  return serial_port_.GetOutgoingData(data, len);
-}
-inline void HalApi::test_serialPutIncomingData(const char *data, uint16_t len) {
-  serial_port_.PutIncomingData(data, len);
-}
-
-inline uint16_t HalApi::debugRead(char *buf, uint16_t len) {
-  return debug_serial_port_.Read(buf, len);
-}
-inline uint16_t HalApi::debugBytesAvailableForRead() {
-  return debug_serial_port_.BytesAvailableForRead();
-}
-inline uint16_t HalApi::debugWrite(const char *buf, uint16_t len) {
-  return debug_serial_port_.Write(buf, len);
-}
-inline uint16_t HalApi::debugBytesAvailableForWrite() {
-  return debug_serial_port_.BytesAvailableForWrite();
-}
-inline uint16_t HalApi::test_debugGetOutgoingData(char *data, uint16_t len) {
-  return debug_serial_port_.GetOutgoingData(data, len);
-}
-inline void HalApi::test_debugPutIncomingData(const char *data, uint16_t len) {
-  debug_serial_port_.PutIncomingData(data, len);
-}
-
 inline void HalApi::disableInterrupts() { interruptsEnabled_ = false; }
 inline void HalApi::enableInterrupts() { interruptsEnabled_ = true; }
 inline bool HalApi::interruptsEnabled() { return interruptsEnabled_; }
 inline bool HalApi::InInterruptHandler() { return false; }
-
-inline uint32_t HalApi::crc32(uint8_t *data, uint32_t length) {
-  return soft_crc32(reinterpret_cast<char *>(data), length);
-}
 
 inline uint16_t TestSerialPort::Read(char *buf, uint16_t len) {
   if (incoming_data_.empty()) {

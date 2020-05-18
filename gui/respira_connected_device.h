@@ -1,12 +1,18 @@
+#include <QSerialPort>
+#include <QtDebug>
+#include <memory>
+
 #include "../common/generated_libs/network_protocol/network_protocol.pb.h"
+#include "../common/libs/checksum/checksum.h"
+#include "../common/libs/framing/frame_detector.h"
+#include "../common/libs/framing/framing.h"
 #include "../common/third_party/nanopb/pb_common.h"
 #include "../common/third_party/nanopb/pb_decode.h"
 #include "../common/third_party/nanopb/pb_encode.h"
 #include "chrono.h"
 #include "connected_device.h"
-#include <QSerialPort>
-#include <QtDebug>
-#include <memory>
+#include "qserial_output_stream.h"
+#include "rx_buffer.h"
 
 // Connects to system serial port, does nanopb serialization/deserialization
 // of GuiStatus and ControllerStatus and provides methods to send/receive
@@ -30,8 +36,16 @@ constexpr DurationMs INTER_FRAME_TIMEOUT_MS = DurationMs(42);
 // will usually swallow it immeadetely, but just in case we set a timeout.
 constexpr DurationMs WRITE_TIMEOUT_MS = DurationMs(15);
 
-class RespiraConnectedDevice : public ConnectedDevice {
+// Size of the rx buffer is set asuming a corner case where EVERY GuiStatus
+// byte and CRC32 will be escaped + two marker chars; this is too big, but
+// safe.
+static constexpr int RX_FRAME_LEN_MAX = (ControllerStatus_size + 4) * 2 + 2;
 
+static QRxBuffer<RX_FRAME_LEN_MAX> rx_buffer_(FRAMING_MARK);
+static FrameDetector<QRxBuffer<RX_FRAME_LEN_MAX>, RX_FRAME_LEN_MAX>
+    frame_detector_(rx_buffer_);
+
+class RespiraConnectedDevice : public ConnectedDevice {
 public:
   RespiraConnectedDevice(QString portName) : serialPortName_(portName) {}
 
@@ -58,27 +72,28 @@ public:
     if (!serialPort_->open(QIODevice::ReadWrite)) {
       return false;
     }
+    frame_detector_.Begin();
     return true;
   }
 
+  static constexpr auto EncodeGuiStatusFrame =
+      EncodeFrame<GuiStatus, GuiStatus_fields, GuiStatus_size>;
+
   bool SendGuiStatus(const GuiStatus &gui_status) override {
     if (!createPortMaybe()) {
-      // TODO log an error, Serial port could not be opened, raise an Alert
+      // TODO log an error, Serial port could not be opened, raise an
+      // Alert
       qFatal("Could not open serial port for sending %s",
              serialPortName_.toStdString().c_str());
       return false;
     }
 
-    uint8_t tx_buffer[GuiStatus_size];
-
-    pb_ostream_t stream = pb_ostream_from_buffer(tx_buffer, sizeof(tx_buffer));
-    if (!pb_encode(&stream, GuiStatus_fields, &gui_status)) {
-      // TODO: Serialization failure; log an error and/or raise an alert.
-      qCritical() << "Could not serialize GuiStatus";
+    QSerialOutputStream output_stream = QSerialOutputStream(serialPort_);
+    uint32_t encoded_length = EncodeGuiStatusFrame(gui_status, output_stream);
+    if (0 == encoded_length) {
+      qCritical() << "Could not frame serialized GuiStatus";
       return false;
     }
-
-    serialPort_->write((const char *)tx_buffer, stream.bytes_written);
 
     if (!serialPort_->waitForBytesWritten(WRITE_TIMEOUT_MS.count())) {
       // TODO communication failure, port closed? Log an error and raise
@@ -89,7 +104,11 @@ public:
     return true;
   }
 
+  static constexpr auto DecodeControllerStatusFrame =
+      DecodeFrame<ControllerStatus, ControllerStatus_fields>;
+
   bool ReceiveControllerStatus(ControllerStatus *controller_status) override {
+    qCritical() << "ReceiveControllerStatus";
     if (!createPortMaybe()) {
       qFatal("Could not open serial port for reading %s",
              serialPortName_.toStdString().c_str());
@@ -97,7 +116,7 @@ public:
       return false;
     }
 
-    // wait for incomming data
+    //    wait for incomming data
     if (!serialPort_->waitForReadyRead(INTER_FRAME_TIMEOUT_MS.count())) {
       // TODO frame from CycleController is not on schedule, raise an alert
       qCritical()
@@ -105,22 +124,33 @@ public:
       return false;
     }
 
-    QByteArray responseData = serialPort_->readAll();
-
-    // continue reading characters until we don't see
-    // any data for long enough to estimate end of packet silence
-    while (serialPort_->waitForReadyRead(INTER_FRAME_TIMEOUT_MS.count() / 5)) {
-      responseData += serialPort_->readAll();
+    if (serialPort_->bytesAvailable() > 0) {
+      qCritical() << "Serial data available";
+      QByteArray raw_data = serialPort_->readAll();
+      qCritical() << "size " << raw_data.size();
+      for (int i = 0; i < raw_data.size(); i++) {
+        // qCritical() << i << ":" << (uint8_t)raw_data.at(i);
+        rx_buffer_.PutByte(raw_data.at(i));
+      }
+    } else {
+      qCritical() << "No bytes";
     }
 
-    pb_istream_t stream = pb_istream_from_buffer(
-        (const uint8_t *)responseData.data(), responseData.length());
+    if (frame_detector_.is_frame_available()) {
+      uint8_t *buf = frame_detector_.get_frame_buf();
+      uint32_t len = frame_detector_.get_frame_length();
+      qCritical() << "Got frame";
 
-    if (!pb_decode(&stream, ControllerStatus_fields, controller_status)) {
-      qCritical()
-          << "Could not de-serialize received data as Controller Status";
-      // TODO: Log an error. Raise an Alert?
-      return false;
+      DecodeResult result =
+          DecodeControllerStatusFrame(buf, len, controller_status);
+
+      if (DecodeResult::SUCCESS != result) {
+        qCritical() << "Could not decode received data as a frame, error code: "
+                    << result;
+        return false;
+        // TODO: Log an error. Raise an Alert?
+      }
+      qCritical() << "Frame decoded!!!!!";
     }
 
     return true;

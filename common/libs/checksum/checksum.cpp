@@ -59,7 +59,7 @@ uint32_t crc32_single(uint32_t crc, uint8_t data) {
   return crc;
 }
 
-uint32_t soft_crc32(const char *data, uint32_t count) {
+uint32_t soft_crc32(const uint8_t *data, uint32_t count) {
   if (0 == count) {
     return 0;
   }
@@ -69,4 +69,20 @@ uint32_t soft_crc32(const char *data, uint32_t count) {
     crc = crc32_single(crc, *data++);
   }
   return crc;
+}
+
+uint32_t extract_crc(const uint8_t *buf, uint32_t data_length) {
+  if (data_length < 4) {
+    return 0;
+  }
+
+  uint32_t crc = static_cast<uint32_t>(buf[data_length - 1 - 3]) << 24 |
+                 static_cast<uint32_t>(buf[data_length - 1 - 2]) << 16 |
+                 static_cast<uint32_t>(buf[data_length - 1 - 1]) << 8 |
+                 static_cast<uint32_t>(buf[data_length - 1]);
+  return crc;
+}
+
+bool is_crc_pass(const uint8_t *buf, uint32_t len) {
+  return soft_crc32(buf, len - 4) == extract_crc(buf, len);
 }
