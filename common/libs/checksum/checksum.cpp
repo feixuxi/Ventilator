@@ -16,18 +16,6 @@ limitations under the License.
 #include "checksum.h"
 #include <stdint.h>
 
-uint16_t checksum_fletcher16(const char *data, uint8_t count,
-                             uint16_t state /*=0*/) {
-  uint8_t s1 = static_cast<uint8_t>(state & 0xff);
-  uint8_t s2 = static_cast<uint8_t>((state >> 8) & 0xff);
-  for (uint8_t index = 0; index < count; ++index) {
-    s1 = static_cast<uint8_t>(
-        (uint16_t{s1} + static_cast<uint16_t>(data[index])) % 255);
-    s2 = static_cast<uint8_t>((uint16_t{s2} + uint16_t{s1}) % 255);
-  }
-  return static_cast<uint16_t>((uint16_t{s2} << 8) | s1);
-}
-
 // The polynomial 0x741B8CD7 has Hamming distance 6 up to 16360 bits
 // and Hamming distance 4 up to 114663 bits.
 //[Philip Koopman, 32-Bit Cyclic Redundancy Codes for Internet Applications
