@@ -17,7 +17,7 @@ SoftRxBuffer<LEN> rx_buf('.');
 
 TEST(FrameDetector, TrivialRx) {
   FrameDetector<SoftRxBuffer<LEN>, LEN> frame_detector(rx_buf);
-  frame_detector.Begin();
+  EXPECT_TRUE(frame_detector.Begin());
   ASSERT_EQ(STATE_LOST, frame_detector.get_state());
   EXPECT_FALSE(frame_detector.is_frame_available());
 
@@ -48,7 +48,7 @@ TEST(FrameDetector, TrivialRx) {
 
 TEST(FrameDetector, MarkFirstInLost) {
   FrameDetector<SoftRxBuffer<LEN>, LEN> frame_detector(rx_buf);
-  frame_detector.Begin();
+  EXPECT_TRUE(frame_detector.Begin());
   ASSERT_EQ(STATE_LOST, frame_detector.get_state());
   EXPECT_FALSE(frame_detector.is_frame_available());
 
@@ -59,7 +59,7 @@ TEST(FrameDetector, MarkFirstInLost) {
 
 TEST(FrameDetector, JunkWhileWaitForStart) {
   FrameDetector<SoftRxBuffer<LEN>, LEN> frame_detector(rx_buf);
-  frame_detector.Begin();
+  EXPECT_TRUE(frame_detector.Begin());
   ASSERT_EQ(STATE_LOST, frame_detector.get_state());
   EXPECT_FALSE(frame_detector.is_frame_available());
 
@@ -82,7 +82,7 @@ TEST(FrameDetector, JunkWhileWaitForStart) {
 
 TEST(FrameDetector, RxComplete) {
   FrameDetector<SoftRxBuffer<LEN>, LEN> frame_detector(rx_buf);
-  frame_detector.Begin();
+  EXPECT_TRUE(frame_detector.Begin());
   ASSERT_EQ(STATE_LOST, frame_detector.get_state());
   EXPECT_FALSE(frame_detector.is_frame_available());
 
@@ -97,7 +97,7 @@ TEST(FrameDetector, RxComplete) {
 
 TEST(FrameDetector, ErrorWhileRx) {
   FrameDetector<SoftRxBuffer<LEN>, LEN> frame_detector(rx_buf);
-  frame_detector.Begin();
+  EXPECT_TRUE(frame_detector.Begin());
   ASSERT_EQ(STATE_LOST, frame_detector.get_state());
   EXPECT_FALSE(frame_detector.is_frame_available());
 

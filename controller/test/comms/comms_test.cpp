@@ -185,7 +185,7 @@ TEST(CommTests, CommandRx) {
 
   ControllerStatus controller_status_ignored = ControllerStatus_init_zero;
   GuiStatus received = GuiStatus_init_zero;
-  comms.init();
+  EXPECT_TRUE(comms.init());
   fake_rx(encoded_length);
   comms.handler(controller_status_ignored, &received);
   EXPECT_EQ(s.uptime_ms, received.uptime_ms);

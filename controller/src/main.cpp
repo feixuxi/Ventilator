@@ -200,7 +200,10 @@ int main() {
   // HalApi::init().
   Hal.init();
 
-  comms.init();
+  if (!comms.init()) {
+    // TODO maybe handle this in more involving way
+    Hal.reset_device();
+  }
 
   background_loop();
 }

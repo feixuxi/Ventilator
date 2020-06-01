@@ -18,9 +18,9 @@ public:
   FrameDetector(RxBuffer &t) : rx_buffer_(t){};
 
   // Starts frame detector
-  void Begin() {
+  [[nodiscard]] bool Begin() {
     state_ = State::LOST;
-    rx_buffer_.Begin(this);
+    return rx_buffer_.Begin(this);
   }
 
   // Callback method called when RxBuffer is full

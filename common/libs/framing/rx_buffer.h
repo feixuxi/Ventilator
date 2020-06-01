@@ -18,7 +18,10 @@ public:
     rx_listener = listener;
   }
 
-  void Begin(RxListener *listener) { RestartRX(listener); };
+  bool Begin(RxListener *listener) {
+    RestartRX(listener);
+    return true;
+  };
 
   uint32_t ReceivedLength() { return rx_i_; };
 

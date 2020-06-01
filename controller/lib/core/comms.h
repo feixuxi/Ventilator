@@ -47,7 +47,8 @@ class Comms : public TxListener {
 
 public:
   Comms() : uart_dma_(uart_dma), frame_detector_(frame_detector){};
-  void init();
+  // Returns true on successfull initialization, false otherwise
+  [[nodiscard]] bool init();
   void onTxComplete() override;
   void onTxError() override;
   // `controller_status` should be the controller's current status.  It's sent

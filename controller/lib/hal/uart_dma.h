@@ -45,7 +45,8 @@ public:
   // Returns false if DMA transmission is in progress, does not
   // interrupt previous transmission.
   // Returns true if no transmission is in progress
-  bool startTX(const uint8_t *buf, uint32_t length, TxListener *txl);
+  [[nodiscard]] bool startTX(const uint8_t *buf, uint32_t length,
+                             TxListener *txl);
 
   uint32_t getRxBytesLeft();
 
@@ -58,8 +59,8 @@ public:
   // setup. Returns true if no reception is in progress and new reception
   // was setup.
 
-  bool startRX(const uint8_t *buf, uint32_t length, Duration timeout,
-               RxListener *rxl);
+  [[nodiscard]] bool startRX(const uint8_t *buf, uint32_t length,
+                             Duration timeout, RxListener *rxl);
   void stopRX();
   void charMatchEnable();
 

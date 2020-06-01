@@ -63,7 +63,9 @@ public:
 
   void onTxComplete() override {
     if (schedule_tx) {
-      uart_dma.startTX(buf, i, this);
+      // started flag can be safely ignored as we are in TxComplete handler that
+      // gets called when there is no more active tx happening
+      [[maybe_unused]] bool started = uart_dma.startTX(buf, i, this);
       SwapBuffers();
       schedule_tx = false;
     }
@@ -85,8 +87,9 @@ private:
       schedule_tx = true;
       return STREAM_SUCCESS;
     }
-
-    uart_dma.startTX(buf, i, this);
+    // we can safely ignore this started flag as we have checked that
+    // transmission is not in progress before
+    [[maybe_unused]] bool started = uart_dma.startTX(buf, i, this);
     SwapBuffers();
     return STREAM_SUCCESS;
   }

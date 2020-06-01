@@ -56,12 +56,10 @@ void Comms::process_tx(const ControllerStatus &controller_status) {
   Hal.enableInterrupts();
 
   if (0 == frame_len) {
-    // debug.Print("0");
     // TODO log an error
     return;
   }
 
-  // debug.Print("*");
   last_tx = Hal.now();
 }
 
@@ -81,7 +79,7 @@ void Comms::process_rx(GuiStatus *gui_status) {
   }
 }
 
-void Comms::init() { frame_detector_.Begin(); }
+bool Comms::init() { return frame_detector_.Begin(); }
 
 void Comms::handler(const ControllerStatus &controller_status,
                     GuiStatus *gui_status) {

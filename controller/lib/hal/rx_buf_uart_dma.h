@@ -11,16 +11,17 @@ public:
   RxBufferUartDma(UART_DMA &uart_dma) : uart_dma_(uart_dma){};
 
   // Sets up underlying receive infrastructure and starts the first reception
-  void RxBufferUartDma::Begin(RxListener *rxl) {
+  [[nodiscard]] bool Begin(RxListener *rxl) {
     uart_dma_.charMatchEnable();
-    uart_dma_.startRX(rx_buf_, RX_BYTES_MAX, RX_TIMEOUT_, rxl);
+    return uart_dma_.startRX(rx_buf_, RX_BYTES_MAX, RX_TIMEOUT_, rxl);
   }
 
   // Restarts the ongoing reception, this means the rx_buf will be written from
   // the beginning
   void RestartRX(RxListener *rxl) {
     uart_dma_.stopRX();
-    uart_dma_.startRX(rx_buf_, RX_BYTES_MAX, RX_TIMEOUT_, rxl);
+    [[maybe_unused]] bool started =
+        uart_dma_.startRX(rx_buf_, RX_BYTES_MAX, RX_TIMEOUT_, rxl);
   }
 
   // Returns how many bytes were written into rx_buf
@@ -33,7 +34,7 @@ public:
 
 #ifdef TEST_MODE
   // Puts a byte to rx_buf
-  void test_PutByte(uint8_t b) { rx_buf_[rx_i++] = b; }
+  void test_PutByte(uint8_t b);
 #endif
 
 private:
@@ -46,5 +47,14 @@ private:
   // TODO determine the right amount of time via risk analysis
   static constexpr Duration RX_TIMEOUT_ = seconds(10);
 };
+
+#ifdef TEST_MODE
+extern uint32_t rx_i;
+// Puts a byte to rx_buf
+template <int RX_BYTES_MAX>
+void RxBufferUartDma<RX_BYTES_MAX>::test_PutByte(uint8_t b) {
+  rx_buf_[rx_i++] = b;
+}
+#endif
 
 #endif
