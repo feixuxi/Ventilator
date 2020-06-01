@@ -2,9 +2,9 @@
 #define __RX_BUFFER_H
 #include "framing.h"
 #include "serial_listeners.h"
-#include <QtDebug>
+#include <stdint.h>
 
-template <int RX_BYTES_MAX> class QRxBuffer {
+template <int RX_BYTES_MAX> class SoftRxBuffer {
   uint8_t rx_buf_[RX_BYTES_MAX];
   uint32_t rx_i_ = 0;
   RxListener *rx_listener;
@@ -12,7 +12,7 @@ template <int RX_BYTES_MAX> class QRxBuffer {
   static constexpr uint32_t RX_TIMEOUT_ = 115200 * 10;
 
 public:
-  explicit QRxBuffer(uint8_t match_char) : match_char_(match_char){};
+  explicit SoftRxBuffer(uint8_t match_char) : match_char_(match_char){};
   void RestartRX(RxListener *listener) {
     rx_i_ = 0;
     rx_listener = listener;
@@ -27,7 +27,7 @@ public:
   void PutByte(uint8_t b) {
     if (rx_i_ < RX_BYTES_MAX) {
       rx_buf_[rx_i_++] = b;
-      if (FRAMING_MARK == b) {
+      if (match_char_ == b) {
         if (rx_listener) {
           rx_listener->onCharacterMatch();
         }
