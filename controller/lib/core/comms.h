@@ -21,6 +21,7 @@ limitations under the License.
 #include "frame_detector.h"
 #include "hal.h"
 #include "network_protocol.pb.h"
+#include "proto_traits.h"
 #include "rx_buf_uart_dma.h"
 #include "uart_dma.h"
 #include "units.h"
@@ -32,7 +33,8 @@ limitations under the License.
 // Size of the rx buffer is set asuming a corner case where EVERY GuiStatus
 // byte and CRC32 will be escaped + two marker chars; this is too big, but
 // safe.
-static constexpr uint32_t RX_FRAME_LEN_MAX = (GuiStatus_size + 4) * 2 + 2;
+static constexpr uint32_t RX_FRAME_LEN_MAX =
+    ProtoTraits<GuiStatus>::MaxFrameSize;
 
 extern UART_DMA uart_dma;
 
@@ -71,7 +73,8 @@ private:
   // Size of the buffer is set asuming a corner case where EVERY
   // ControllerStatus byte and CRC32 will be escaped + two marker chars; this is
   // too big, but safe.
-  static constexpr uint32_t TX_BUF_LEN = (ControllerStatus_size + 4) * 2 + 2;
+  static constexpr uint32_t TX_BUF_LEN =
+      ProtoTraits<ControllerStatus>::MaxFrameSize;
   uint8_t tx_buffer[TX_BUF_LEN];
 
   // Time when we started sending the last ControllerStatus.

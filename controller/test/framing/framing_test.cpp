@@ -30,7 +30,7 @@ static constexpr auto DecodeControllerStatusFrame =
 UART_DMA uart_dma;
 DmaStream<200> dma_stream;
 
-uint8_t tx_buffer[(ControllerStatus_size + 4) * 2 + 2];
+uint8_t tx_buffer[ProtoTraits<ControllerStatus>::MaxFrameSize];
 uint32_t tx_length = 0;
 bool is_txing = false;
 TxListener *tx_listener;

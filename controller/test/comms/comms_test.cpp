@@ -9,10 +9,11 @@
 #include "framing_streams.h"
 #include "hal.h"
 #include "network_protocol.pb.h"
+#include "proto_traits.h"
 #include "units.h"
 #include "gtest/gtest.h"
 
-uint8_t tx_buffer[(ControllerStatus_size + 4) * 2 + 2];
+uint8_t tx_buffer[ProtoTraits<ControllerStatus>::MaxFrameSize];
 uint32_t tx_length = 0;
 bool is_txing = false;
 

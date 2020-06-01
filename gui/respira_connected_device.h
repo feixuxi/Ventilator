@@ -11,6 +11,7 @@
 #include "../common/third_party/nanopb/pb_encode.h"
 #include "chrono.h"
 #include "connected_device.h"
+#include "proto_traits.h"
 #include "qserial_output_stream.h"
 #include "soft_rx_buffer.h"
 
@@ -39,7 +40,8 @@ constexpr DurationMs WRITE_TIMEOUT_MS = DurationMs(15);
 // Size of the rx buffer is set asuming a corner case where EVERY GuiStatus
 // byte and CRC32 will be escaped + two marker chars; this is too big, but
 // safe.
-static constexpr int RX_FRAME_LEN_MAX = (ControllerStatus_size + 4) * 2 + 2;
+static constexpr int RX_FRAME_LEN_MAX =
+    ProtoTraits<ControllerStatus>::MaxFrameSize;
 
 static SoftRxBuffer<RX_FRAME_LEN_MAX> rx_buffer_(FRAMING_MARK);
 static FrameDetector<SoftRxBuffer<RX_FRAME_LEN_MAX>, RX_FRAME_LEN_MAX>

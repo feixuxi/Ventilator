@@ -1,5 +1,6 @@
 #include "frame_detector.h"
-#include "rx_buffer.h"
+#include "proto_traits.h"
+#include "soft_rx_buffer.h"
 #include "gtest/gtest.h"
 
 constexpr uint32_t LEN = 20;
