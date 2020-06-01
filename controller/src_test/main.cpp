@@ -1,24 +1,23 @@
 #include "debug.h"
 #include "hal.h"
-#include "hal_stm32.h"
 #include "uart_dma.h"
 #include <string.h>
 
 char r[20];
 
 class DummyTxListener : public TxListener {
-  void onTxComplete() { debug.Print("$"); }
-  void onTxError() { debug.Print("E"); };
+  void onTxComplete() override { debug.Print("$"); }
+  void onTxError() override { debug.Print("E"); };
 };
 
 class DummyRxListener : public RxListener {
 public:
-  void onRxComplete() {
+  void onRxComplete() override {
     debug.Print("&");
     debug.Print(r);
   }
-  void onCharacterMatch() { debug.Print("@"); }
-  void onRxError(RxError_t e) {
+  void onCharacterMatch() override { debug.Print("@"); }
+  void onRxError(RxError_t e) override {
     if (RX_ERROR_TIMEOUT == e) {
       debug.Print("T");
     } else {
@@ -27,33 +26,31 @@ public:
   }
 };
 
-// FrameDetector listener = FrameDetector();
 DummyRxListener rxlistener;
 DummyTxListener txlistener;
 
-DMACtrl dmaController(DMA1_BASE);
+DMACtrl dma_ctrl_test(DMA1_BASE);
 
-#include "framing.h"
 constexpr uint8_t txCh = 1;
 constexpr uint8_t rxCh = 2;
-UART_DMA uart_dma(UART3_BASE, DMA1_BASE, txCh, rxCh, '.');
+UART_DMA uart_dma_test(UART3_BASE, DMA1_BASE, txCh, rxCh, '.');
 
 int main() {
   Hal.init();
-  dmaController.init();
+  dma_ctrl_test.init();
 
   debug.Print("*");
   char s[] = "ping ping ping ping ping ping ping ping ping ping ping ping\n";
   bool dmaStarted = false;
 
-  dmaStarted = uart_dma.startTX((uint8_t *)s, strlen(s), &txlistener);
+  dmaStarted = uart_dma_test.startTX((uint8_t *)s, strlen(s), 0);
   if (dmaStarted) {
     debug.Print("!");
   }
 
-  uart_dma.charMatchEnable();
+  uart_dma_test.charMatchEnable();
 
-  dmaStarted = uart_dma.startRX((uint8_t *)r, 10, 115200 * 2, &rxlistener);
+  dmaStarted = uart_dma_test.startRX((uint8_t *)r, 10, 115200 * 2, 0);
   if (dmaStarted) {
     debug.Print("!");
   }
