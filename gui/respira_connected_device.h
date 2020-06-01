@@ -12,7 +12,7 @@
 #include "chrono.h"
 #include "connected_device.h"
 #include "qserial_output_stream.h"
-#include "rx_buffer.h"
+#include "soft_rx_buffer.h"
 
 // Connects to system serial port, does nanopb serialization/deserialization
 // of GuiStatus and ControllerStatus and provides methods to send/receive
@@ -41,8 +41,8 @@ constexpr DurationMs WRITE_TIMEOUT_MS = DurationMs(15);
 // safe.
 static constexpr int RX_FRAME_LEN_MAX = (ControllerStatus_size + 4) * 2 + 2;
 
-static QRxBuffer<RX_FRAME_LEN_MAX> rx_buffer_(FRAMING_MARK);
-static FrameDetector<QRxBuffer<RX_FRAME_LEN_MAX>, RX_FRAME_LEN_MAX>
+static SoftRxBuffer<RX_FRAME_LEN_MAX> rx_buffer_(FRAMING_MARK);
+static FrameDetector<SoftRxBuffer<RX_FRAME_LEN_MAX>, RX_FRAME_LEN_MAX>
     frame_detector_(rx_buffer_);
 
 class RespiraConnectedDevice : public ConnectedDevice {
@@ -72,12 +72,13 @@ public:
     if (!serialPort_->open(QIODevice::ReadWrite)) {
       return false;
     }
-    frame_detector_.Begin();
+    if (!frame_detector_.Begin()) {
+      return false;
+    }
     return true;
   }
 
-  static constexpr auto EncodeGuiStatusFrame =
-      EncodeFrame<GuiStatus, GuiStatus_fields, GuiStatus_size>;
+  static constexpr auto EncodeGuiStatusFrame = EncodeFrame<GuiStatus>;
 
   bool SendGuiStatus(const GuiStatus &gui_status) override {
     if (!createPortMaybe()) {
@@ -105,7 +106,7 @@ public:
   }
 
   static constexpr auto DecodeControllerStatusFrame =
-      DecodeFrame<ControllerStatus, ControllerStatus_fields>;
+      DecodeFrame<ControllerStatus>;
 
   bool ReceiveControllerStatus(ControllerStatus *controller_status) override {
     qCritical() << "ReceiveControllerStatus";
@@ -137,7 +138,7 @@ public:
     }
 
     if (frame_detector_.is_frame_available()) {
-      uint8_t *buf = frame_detector_.get_frame_buf();
+      uint8_t *buf = frame_detector_.TakeFrame();
       uint32_t len = frame_detector_.get_frame_length();
       qCritical() << "Got frame";
 

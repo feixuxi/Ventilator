@@ -1,5 +1,5 @@
-#ifndef __RX_BUFFER_H
-#define __RX_BUFFER_H
+#ifndef __SOFT_RX_BUFFER_H
+#define __SOFT_RX_BUFFER_H
 #include "framing.h"
 #include "serial_listeners.h"
 #include <stdint.h>

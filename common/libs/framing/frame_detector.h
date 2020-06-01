@@ -77,7 +77,7 @@ public:
   }
 
   // Callback method called when underlying Rx system experiences an error
-  void onRxError(RxError_t e) override {
+  void onRxError([[maybe_unused]] RxError_t e) override {
     switch (state_) {
     case State::LOST:
     case State::WAIT_START:

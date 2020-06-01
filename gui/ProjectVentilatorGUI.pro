@@ -21,6 +21,7 @@ INCLUDEPATH += $$PWD/../common/third_party/nanopb
 INCLUDEPATH += $$PWD/../common/libs/checksum
 INCLUDEPATH += $$PWD/../common/generated_libs/network_protocol
 INCLUDEPATH += $$PWD/../common/libs/framing
+INCLUDEPATH += $$PWD/../common/libs/proto_traits
 RESOURCES += qml.qrc images/Logo.png
 DISTFILES += images/Logo.png
 TRANSLATIONS += ProjectVentilatorGUI_es_GT.ts
