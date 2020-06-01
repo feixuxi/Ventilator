@@ -50,7 +50,7 @@ int main() {
 
   uart_dma_test.charMatchEnable();
 
-  dmaStarted = uart_dma_test.startRX((uint8_t *)r, 10, 115200 * 2, 0);
+  dmaStarted = uart_dma_test.startRX((uint8_t *)r, 10, seconds(2), 0);
   if (dmaStarted) {
     debug.Print("!");
   }
