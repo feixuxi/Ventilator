@@ -43,17 +43,14 @@ TEST(FramingTests, DecodingDestTooSmall) {
   ASSERT_GT(frameLength, (uint32_t)0);
 }
 
-static constexpr auto EncodeGuiStatusFrame =
-    EncodeFrame<GuiStatus, GuiStatus_fields, GuiStatus_size>;
+static constexpr auto EncodeGuiStatusFrame = EncodeFrame<GuiStatus>;
 
-static auto DecodeGuiStatusFrame = DecodeFrame<GuiStatus, GuiStatus_fields>;
+static auto DecodeGuiStatusFrame = DecodeFrame<GuiStatus>;
 
-static auto EncodeControllerStatusFrame =
-    EncodeFrame<ControllerStatus, ControllerStatus_fields,
-                ControllerStatus_size>;
+static auto EncodeControllerStatusFrame = EncodeFrame<ControllerStatus>;
 
 static constexpr auto DecodeControllerStatusFrame =
-    DecodeFrame<ControllerStatus, ControllerStatus_fields>;
+    DecodeFrame<ControllerStatus>;
 
 UART_DMA uart_dma;
 DmaStream<200> dma_stream;

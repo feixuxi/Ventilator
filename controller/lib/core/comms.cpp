@@ -36,9 +36,7 @@ void Comms::onTxError() {
 }
 
 DmaStream<(ControllerStatus_size + 2) * 2 + 2> dma_stream;
-static auto EncodeControllerStatusFrame =
-    EncodeFrame<ControllerStatus, ControllerStatus_fields,
-                ControllerStatus_size>;
+static auto EncodeControllerStatusFrame = EncodeFrame<ControllerStatus>;
 
 void Comms::process_tx(const ControllerStatus &controller_status) {
   // Serialize our current state into the buffer if
@@ -66,7 +64,7 @@ void Comms::process_tx(const ControllerStatus &controller_status) {
   last_tx = Hal.now();
 }
 
-static auto DecodeGuiStatusFrame = DecodeFrame<GuiStatus, GuiStatus_fields>;
+static auto DecodeGuiStatusFrame = DecodeFrame<GuiStatus>;
 
 void Comms::process_rx(GuiStatus *gui_status) {
   if (frame_detector_.is_frame_available()) {
