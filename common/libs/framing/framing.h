@@ -1,6 +1,8 @@
-#ifndef __FRAMING_H
-#define __FRAMING_H
+#ifndef __FRAMING_H__
+#define __FRAMING_H__
+
 #include "checksum.h"
+#include "framing_spec_chars.h"
 #include "framing_streams.h"
 #include "network_protocol.pb.h"
 #include "proto_traits.h"
@@ -67,7 +69,7 @@ static uint32_t EncodedLength(uint8_t *buf, uint32_t len) {
   CounterStream counter_stream;
   EscapeStream esc_stream(counter_stream);
   CrcStream crc_stream(esc_stream);
-  StreamResponse r = {0, SUCCESS};
+  StreamResponse r = {0, STREAM_SUCCESS};
   for (uint32_t i = 0; i < len; i++) {
     r += crc_stream.Put(buf[i]);
   }
@@ -106,5 +108,4 @@ uint32_t EncodeFrame(const PbType &pb_object, OutputStream &output_stream) {
   r += crc_stream.Put(END_OF_STREAM);
   return r.count_written;
 }
-
 #endif

@@ -1,5 +1,5 @@
-#ifndef __FRAMING_RX_FSM
-#define __FRAMING_RX_FSM
+#ifndef __FRAME_DETECTOR__
+#define __FRAME_DETECTOR__
 
 #include "serial_listeners.h"
 #include <string.h>

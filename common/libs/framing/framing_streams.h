@@ -2,10 +2,9 @@
 #define __FRAMING_STREAMS_H_
 
 #include "checksum.h"
+#include "framing_spec_chars.h"
 #include <stdint.h>
 
-constexpr uint8_t FRAMING_MARK = 0xE2;
-constexpr uint8_t FRAMING_ESC = 0x27;
 constexpr int32_t END_OF_STREAM = -1;
 
 enum ResponseFlags {

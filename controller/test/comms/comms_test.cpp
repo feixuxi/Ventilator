@@ -6,7 +6,7 @@
 
 #include "checksum.h"
 #include "frame_detector.h"
-#include "framing.h"
+#include "framing_streams.h"
 #include "hal.h"
 #include "network_protocol.pb.h"
 #include "gtest/gtest.h"
@@ -31,6 +31,8 @@ void UART_DMA::charMatchEnable(){};
 
 UART_DMA uart_dma = UART_DMA();
 
+uint32_t UnescapeFrame(uint8_t *source, uint32_t sourceLength, uint8_t *dest,
+                       uint32_t destLength);
 TEST(CommTests, SendControllerStatus) {
   Comms comms;
   // Initialize a large ControllerStatus so as to force multiple calls to

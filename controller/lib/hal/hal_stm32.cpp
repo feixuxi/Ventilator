@@ -26,7 +26,7 @@ the programmer's manual for the processor available here:
 #if defined(BARE_STM32)
 
 #include "hal_stm32.h"
-#include "framing.h"
+#include "framing_spec_chars.h"
 
 #include <stdarg.h>
 #include <stdio.h>

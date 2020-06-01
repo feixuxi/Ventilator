@@ -2,6 +2,7 @@
 
 #include "algorithm.h"
 #include "checksum.h"
+#include "frame_detector.h"
 #include "framing.h"
 #include "hal.h"
 #include "network_protocol.pb.h"
