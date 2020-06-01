@@ -9,22 +9,22 @@ char r[20];
 extern UART_DMA dmaUART;
 
 class DummyTxListener : public UART_DMA_TxListener {
-  void onTxComplete() { debugPrint("$"); }
+  void onTxComplete() { debug.Print("$"); }
   void onTxError(){};
 };
 
 class DummyRxListener : public UART_DMA_RxListener {
 public:
   void onRxComplete() {
-    debugPrint("&");
-    debugPrint(r);
+    debug.Print("&");
+    debug.Print(r);
   }
-  void onCharacterMatch() { debugPrint("@"); }
+  void onCharacterMatch() { debug.Print("@"); }
   void onRxError(RxError_t e) {
     if (RX_ERROR_TIMEOUT == e) {
-      debugPrint("T");
+      debug.Print("T");
     } else {
-      debugPrint("#");
+      debug.Print("#");
     };
   }
 };
@@ -43,28 +43,28 @@ int main() {
   Hal.init();
   dmaController.init();
 
-  debugPrint("*");
+  debug.Print("*");
   char s[] = "ping ping ping ping ping ping ping ping ping ping ping ping\n";
   bool dmaStarted = false;
 
   dmaStarted = dmaUART.startTX(s, strlen(s));
   if (dmaStarted) {
-    debugPrint("!");
+    debug.Print("!");
   }
 
   dmaUART.charMatchEnable();
 
   dmaStarted = dmaUART.startRX(r, 10, 115200 * 2);
   if (dmaStarted) {
-    debugPrint("!");
+    debug.Print("!");
   }
 
   while (1) {
     Hal.watchdog_handler();
-    char i[1];
-    if (1 == debugRead(i, 1)) {
-      Hal.reset_device();
-    }
+    // char i[1];
+    // if (1 == debug.Read(i, 1)) {
+    //   Hal.reset_device();
+    // }
     Hal.delay(milliseconds(10));
   }
 }

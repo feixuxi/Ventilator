@@ -51,13 +51,14 @@ void UART_DMA::init(int baud) {
   dma->channel[rxCh].config.tcie = 1;        // interrupt on DMA complete
 
   dma->channel[rxCh].config.mem2mem = 0; // memory-to-memory mode disabled
-  dma->channel[rxCh].config.msize = DmaTransferSize::BITS8;
-  dma->channel[rxCh].config.psize = DmaTransferSize::BITS8;
+  dma->channel[rxCh].config.msize = static_cast<REG>(DmaTransferSize::BITS8);
+  dma->channel[rxCh].config.psize = static_cast<REG>(DmaTransferSize::BITS8);
   dma->channel[rxCh].config.memInc = 1;   // increment destination (memory)
   dma->channel[rxCh].config.perInc = 0;   // don't increment source
                                           // (peripheral) address
   dma->channel[rxCh].config.circular = 0; // not circular
-  dma->channel[rxCh].config.dir = DmaChannelDir::PERIPHERAL_TO_MEM;
+  dma->channel[rxCh].config.dir =
+      static_cast<REG>(DmaChannelDir::PERIPHERAL_TO_MEM);
 
   dma->channel[txCh].config.priority = 0b11; // high priority
   dma->channel[txCh].config.teie = 1;        // interrupt on error
@@ -65,13 +66,14 @@ void UART_DMA::init(int baud) {
   dma->channel[txCh].config.tcie = 1;        // DMA complete interrupt enabled
 
   dma->channel[txCh].config.mem2mem = 0; // memory-to-memory mode disabled
-  dma->channel[txCh].config.msize = DmaTransferSize::BITS8;
-  dma->channel[txCh].config.psize = DmaTransferSize::BITS8;
+  dma->channel[txCh].config.msize = static_cast<REG>(DmaTransferSize::BITS8);
+  dma->channel[txCh].config.psize = static_cast<REG>(DmaTransferSize::BITS8);
   dma->channel[txCh].config.memInc = 1;   // increment source (memory) address
   dma->channel[txCh].config.perInc = 0;   // don't increment dest (peripheral)
                                           // address
   dma->channel[txCh].config.circular = 0; // not circular
-  dma->channel[txCh].config.dir = DmaChannelDir::MEM_TO_PERIPHERAL;
+  dma->channel[txCh].config.dir =
+      static_cast<REG>(DmaChannelDir::MEM_TO_PERIPHERAL);
 }
 
 // Sets up an interrupt on matching char incomming form UART3
@@ -103,9 +105,10 @@ bool UART_DMA::startTX(const char *buf, uint32_t length) {
 
   dma->channel[txCh].config.enable = 0; // Disable channel before config
   // data sink
-  dma->channel[txCh].pAddr = reinterpret_cast<REG>(&(uart->txDat));
+  dma->channel[txCh].pAddr = &(uart->txDat);
   // data source
-  dma->channel[txCh].mAddr = reinterpret_cast<REG>(buf);
+  dma->channel[txCh].mAddr =
+      const_cast<void *>(reinterpret_cast<const void *>(buf));
   // data length
   dma->channel[txCh].count = length & 0x0000FFFF;
 
@@ -142,9 +145,10 @@ bool UART_DMA::startRX(const char *buf, const uint32_t length,
   dma->channel[rxCh].config.enable = 0; // don't enable yet
 
   // data source
-  dma->channel[rxCh].pAddr = reinterpret_cast<REG>(&(uart->rxDat));
+  dma->channel[rxCh].pAddr = &(uart->rxDat);
   // data sink
-  dma->channel[rxCh].mAddr = reinterpret_cast<REG>(buf);
+  dma->channel[rxCh].mAddr =
+      const_cast<void *>(reinterpret_cast<const void *>(buf));
   // data length
   dma->channel[rxCh].count = length;
 
