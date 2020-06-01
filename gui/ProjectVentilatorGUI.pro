@@ -7,7 +7,6 @@ SOURCES += $$files("*.cpp") \
     ../common/third_party/nanopb/pb_common.c \
     ../common/third_party/nanopb/pb_decode.c \
     ../common/third_party/nanopb/pb_encode.c \
-    ../common/libs/framing/framing.cpp \
     ../common/libs/checksum/checksum.cpp
 SOURCES += $$files("$$PWD/../common/**/*.c")
 HEADERS += $$files("*.h") \
