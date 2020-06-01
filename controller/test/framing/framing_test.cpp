@@ -7,31 +7,6 @@
 #include <stdint.h>
 #include <stdio.h>
 
-// void randomConversion() {
-//   constexpr uint32_t SLENGTH = 150;
-//   constexpr uint32_t DLENGTH = (SLENGTH + 4) * 2 + 2 + 1;
-//   uint8_t source_buf[SLENGTH];
-//   uint8_t dest_buf[DLENGTH];
-//   uint8_t decoded_buf[SLENGTH];
-//   for (unsigned int i = 0; i < SLENGTH; i++) {
-//     source_buf[i] = static_cast<uint8_t>(rand() % 255);
-//   }
-
-//   uint32_t frameLength = EscapeFrame(source_buf, SLENGTH, dest_buf, DLENGTH);
-//   ASSERT_GT(frameLength, SLENGTH);
-//   uint32_t decodedLength =
-//       UnescapeFrame(dest_buf, frameLength, decoded_buf, SLENGTH);
-//   ASSERT_EQ(decodedLength, SLENGTH);
-//   int n = memcmp(source_buf, decoded_buf, SLENGTH);
-//   ASSERT_EQ(n, 0);
-// }
-
-TEST(FramingTests, DISABLED_RandomBuffer) {
-  // for (int i = 0; i < 1; i++) {
-  //   randomConversion();
-  // }
-}
-
 TEST(FramingTests, DecodingDestTooSmall) {
   uint8_t source_buf[] = {FRAMING_MARK, 0, 1, 2, 3, FRAMING_MARK};
   uint8_t dest_buf[10];
