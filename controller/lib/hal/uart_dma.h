@@ -2,6 +2,7 @@
 #define __UART_DMA
 #include "hal_stm32_regs.h"
 #include "serial_listeners.h"
+#include "units.h"
 
 class DMACtrl {
   DMA_Regs *const dma;
@@ -23,6 +24,7 @@ class UART_DMA {
   uint8_t rxCh;
   RxListener *rxListener = 0;
   TxListener *txListener = 0;
+  uint32_t baud_;
   char matchChar;
 
 public:
@@ -33,7 +35,7 @@ public:
            uint8_t rxCh, char matchChar)
       : uart(uart), dma(dma), txCh(txCh), rxCh(rxCh), matchChar(matchChar) {}
 
-  void init(int baud);
+  void init(uint32_t baud);
   // Returns true if DMA TX is in progress
   bool isTxInProgress();
   // Returns true if DMA RX is in progress
@@ -56,7 +58,7 @@ public:
   // setup. Returns true if no reception is in progress and new reception
   // was setup.
 
-  bool startRX(const uint8_t *buf, uint32_t length, uint32_t timeout,
+  bool startRX(const uint8_t *buf, uint32_t length, Duration timeout,
                RxListener *rxl);
   void stopRX();
   void charMatchEnable();
@@ -66,6 +68,12 @@ public:
   void DMA_TX_ISR();
 
 private:
+  typedef struct {
+    uint32_t ignored : 8;
+    uint32_t bits : 24;
+  } uint24_t;
+
+  uint24_t DurationToBits(Duration d);
   bool tx_in_progress;
   bool rx_in_progress;
 };

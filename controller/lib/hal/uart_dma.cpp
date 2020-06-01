@@ -3,6 +3,8 @@
 #include "uart_dma.h"
 #include "hal_stm32.h"
 #include "hal_stm32_regs.h"
+#include "units.h"
+
 // STM32 UART3 driver based on DMA transfers.
 
 // Direct Memory Access mode in MCU allows to set up a memory buffer
@@ -18,7 +20,8 @@
 extern UART_DMA uart_dma;
 
 // Performs UART3 initialization
-void UART_DMA::init(int baud) {
+void UART_DMA::init(uint32_t baud) {
+  baud_ = baud;
   // Set baud rate register
   uart->baud = CPU_FREQ / baud;
 
@@ -128,15 +131,20 @@ void UART_DMA::stopTX() {
   }
 }
 
+// Converts Duration to the number of baudrate bits as that is used for rx
+// timeout. Max timeout supported by STM32 UART is 24 bit
+UART_DMA::uint24_t UART_DMA::DurationToBits(Duration d) {
+  return {0,
+          static_cast<uint32_t>(d.milliseconds() * baud_ / 1000) & 0x00FFFFFF};
+}
+
 // Sets up reception of at least [length] chars from UART3 into [buf]
-// [timeout] is the number of baudrate bits for which RX line is
-// allowed to be idle before asserting timeout error.
 // Returns false if reception is in progress, new reception is not
 // setup. Returns true if no reception is in progress and new reception
 // was setup.
 
-bool UART_DMA::startRX(const uint8_t *buf, const uint32_t length,
-                       const uint32_t timeout, RxListener *rxl) {
+bool UART_DMA::startRX(const uint8_t *buf, uint32_t length, Duration timeout,
+                       RxListener *rxl) {
   // UART3 reception happens on DMA1 channel 3
   if (isRxInProgress()) {
     return false;
@@ -155,8 +163,7 @@ bool UART_DMA::startRX(const uint8_t *buf, const uint32_t length,
   dma->channel[rxCh].count = length;
 
   // setup rx timeout
-  // max timeout is 24 bit
-  uart->timeout.s.rto = timeout & 0x00FFFFFF;
+  uart->timeout.s.rto = DurationToBits(timeout).bits;
   uart->intClear.s.rtocf = 1; // Clear rx timeout flag
   uart->request.s.rxfrq = 1;  // Clear RXNE flag
   uart->ctrl1.s.rtoie = 1;    // Enable receive timeout interrupt

@@ -9,13 +9,14 @@
 #include "framing_streams.h"
 #include "hal.h"
 #include "network_protocol.pb.h"
+#include "units.h"
 #include "gtest/gtest.h"
 
 uint8_t tx_buffer[(ControllerStatus_size + 4) * 2 + 2];
 uint32_t tx_length = 0;
 bool is_txing = false;
 
-void UART_DMA::init(int baud){};
+void UART_DMA::init(uint32_t baud){};
 bool UART_DMA::isTxInProgress() { return is_txing; }
 bool UART_DMA::isRxInProgress() { return false; }
 bool UART_DMA::startTX(const uint8_t *buf, uint32_t length, TxListener *txl) {
@@ -93,7 +94,7 @@ uint32_t rx_length = 0;
 
 uint32_t UART_DMA::getRxBytesLeft() { return rx_length - rx_i; };
 
-bool UART_DMA::startRX(const uint8_t *buf, uint32_t length, uint32_t timeout,
+bool UART_DMA::startRX(const uint8_t *buf, uint32_t length, Duration timeout,
                        RxListener *rxl) {
   rx_length = length;
   rx_listener = rxl;

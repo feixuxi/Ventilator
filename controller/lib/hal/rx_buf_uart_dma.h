@@ -9,7 +9,11 @@
 template <int RX_BYTES_MAX> class RxBufferUartDma {
   UART_DMA &uart_dma;
   uint8_t rx_buf_[RX_BYTES_MAX];
-  static constexpr uint32_t RX_TIMEOUT_ = 115200 * 10;
+
+  // If no activity is happening on RX line for the given amount of time,
+  // listener will get an onError callback.
+  // TODO determine the right amount of time via risk analysis
+  static constexpr Duration RX_TIMEOUT_ = seconds(10);
 
 public:
   RxBufferUartDma(UART_DMA &uart_dma) : uart_dma(uart_dma){};
