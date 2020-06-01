@@ -41,7 +41,7 @@ TEST(FrameDetector, TrivialRx) {
   ASSERT_EQ(STATE_WAIT_START, frame_detector.get_state());
   EXPECT_TRUE(frame_detector.is_frame_available());
   EXPECT_EQ(static_cast<uint32_t>(1), frame_detector.get_frame_length());
-  uint8_t *frame = frame_detector.get_frame_buf();
+  uint8_t *frame = frame_detector.TakeFrame();
   EXPECT_EQ(0, memcmp(frame, " ", 1));
   EXPECT_FALSE(frame_detector.is_frame_available());
 }

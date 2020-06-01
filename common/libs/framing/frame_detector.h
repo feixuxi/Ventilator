@@ -16,11 +16,14 @@ public:
   };
 
   FrameDetector(RxBuffer &t) : rx_buffer_(t){};
+
+  // Starts frame detector
   void Begin() {
     state_ = State::LOST;
     rx_buffer_.Begin(this);
   }
 
+  // Callback method called when RxBuffer is full
   void onRxComplete() override {
     // We should never reach the full read of rx buffer.
     // If we get here, this means, there are no marker
@@ -30,6 +33,7 @@ public:
     rx_buffer_.RestartRX(this);
   }
 
+  // Callback method called when we receive a marker character
   void onCharacterMatch() override {
     switch (state_) {
     case State::LOST:
@@ -38,14 +42,11 @@ public:
       // for start
       if (rx_buffer_.ReceivedLength() > 1) {
         state_ = State::WAIT_START;
-        // printf("\nLOST > WAIT_START\n");
         // if we were lucky to get lost in the interframe silence,
         // assume this is the start of the frame
       } else if (rx_buffer_.ReceivedLength() == 1) {
         state_ = State::RX_FRAME;
-        // printf("\nLOST > RX_FRAME\n");
       } else {
-        // printf("!!!! DMA not working!");
         // TODO alert, safe reset
         // Should never end up here
         // DMA is not working?
@@ -53,25 +54,20 @@ public:
       break;
     case State::WAIT_START:
       if (rx_buffer_.ReceivedLength() == 1) {
-        // printf("\nWAIT_START > RX_FRAME\n");
         state_ = State::RX_FRAME;
       } else {
         // some junk received while waiting for start marker,
         // but should have been just silence
         error_counter_++;
         state_ = State::LOST;
-        // printf("! JUNK ! %d", rx_buffer_.ReceivedLength());
-        // printf("\nWAIT_START > LOST\n");
       }
       break;
     case State::RX_FRAME:
       // end marker received, check if we got something
       if (rx_buffer_.ReceivedLength() > 1) {
         processReceivedData();
-        // printf("\nRX_FRAME > WAIT_START\n");
         state_ = State::WAIT_START;
       } else {
-        // printf("! REPEAT MARK");
         // repeated marker char received
         // assume we are still good
       }
@@ -80,6 +76,7 @@ public:
     rx_buffer_.RestartRX(this);
   }
 
+  // Callback method called when underlying Rx system experiences an error
   void onRxError(RxError_t e) override {
     switch (state_) {
     case State::LOST:
@@ -93,12 +90,19 @@ public:
     error_counter_++;
   }
 
-  uint8_t *get_frame_buf() {
+  // Returns the last successfully detected frame, resets the frame_available
+  // flag. I.e. if frame_available was returning true before this call, it will
+  // return false after it
+  uint8_t *TakeFrame() {
     frame_available_ = false;
     return frame_buf_;
   }
 
+  // Returns the length of the last successfully detected frame
   uint32_t get_frame_length() { return frame_buf_length_; }
+
+  // Returns true if a new frame was detected and this frame is available for
+  // read
   bool is_frame_available() { return frame_available_; }
 
 #ifdef TEST_MODE

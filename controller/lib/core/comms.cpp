@@ -69,7 +69,7 @@ static auto DecodeGuiStatusFrame = DecodeFrame<GuiStatus>;
 
 void Comms::process_rx(GuiStatus *gui_status) {
   if (frame_detector_.is_frame_available()) {
-    uint8_t *buf = frame_detector_.get_frame_buf();
+    uint8_t *buf = frame_detector_.TakeFrame();
     uint32_t len = frame_detector_.get_frame_length();
 
     GuiStatus new_gui_status = GuiStatus_init_zero;
