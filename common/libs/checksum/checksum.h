@@ -59,9 +59,8 @@ inline uint16_t check_bytes_fletcher16(uint16_t checksum) {
 inline bool checksum_check(const char *packet, uint8_t packet_len) {
   return checksum_fletcher16(packet, packet_len) == 0;
 }
-uint32_t crc32_single(uint32_t crc, uint8_t data);
 
-uint32_t extract_crc(const uint8_t *buf, uint32_t dataLength);
+uint32_t crc32_single(uint32_t crc, uint8_t data);
 
 bool crc_ok(const uint8_t *buf, uint32_t len);
 

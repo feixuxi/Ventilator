@@ -139,3 +139,12 @@ TEST(Checksum32, BitFlips) {
   EXPECT_LE(maxCollisionsFrac, 0.0002)
       << "Too many collisions on worst checksum; is the checksum broken?";
 }
+
+TEST(Checksum32, CrcOkLength) {
+  EXPECT_FALSE(
+      crc_ok(reinterpret_cast<const uint8_t *>("a\xC8\x08\x93\x1C"), 0));
+  EXPECT_FALSE(
+      crc_ok(reinterpret_cast<const uint8_t *>("\xC8\x08\x93\x1C"), 4));
+  EXPECT_TRUE(
+      crc_ok(reinterpret_cast<const uint8_t *>("a\xC8\x08\x93\x1C"), 5));
+}

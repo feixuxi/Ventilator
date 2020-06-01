@@ -71,7 +71,7 @@ uint32_t soft_crc32(const uint8_t *data, uint32_t count) {
   return crc;
 }
 
-uint32_t extract_crc(const uint8_t *buf, uint32_t data_length) {
+static uint32_t extract_crc(const uint8_t *buf, uint32_t data_length) {
   if (data_length < 4) {
     return 0;
   }
@@ -84,5 +84,10 @@ uint32_t extract_crc(const uint8_t *buf, uint32_t data_length) {
 }
 
 bool crc_ok(const uint8_t *buf, uint32_t len) {
+  // It makes no sense to check CRC on a buffer smaller than 5 bytes.
+  // We need 4 bytes for CRC and at leas 1 byte on which to check CRC
+  if (len < 5) {
+    return false;
+  }
   return soft_crc32(buf, len - 4) == extract_crc(buf, len);
 }
