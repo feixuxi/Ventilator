@@ -69,7 +69,7 @@ TEST(CommTests, SendControllerStatus) {
   uint32_t decoded_length = UnescapeFrame(tx_buffer, tx_length, decoded_buf,
                                           ControllerStatus_size + 4);
   printf("Decoded len: %d\n", decoded_length);
-  EXPECT_TRUE(is_crc_pass(decoded_buf, decoded_length));
+  EXPECT_TRUE(crc_ok(decoded_buf, decoded_length));
   ASSERT_GT(decoded_length, static_cast<uint32_t>(0));
 
   pb_istream_t stream = pb_istream_from_buffer(

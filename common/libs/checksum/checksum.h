@@ -63,6 +63,6 @@ uint32_t crc32_single(uint32_t crc, uint8_t data);
 
 uint32_t extract_crc(const uint8_t *buf, uint32_t dataLength);
 
-bool is_crc_pass(const uint8_t *buf, uint32_t len);
+bool crc_ok(const uint8_t *buf, uint32_t len);
 
 #endif // CHECKSUM_H

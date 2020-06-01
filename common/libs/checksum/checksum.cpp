@@ -83,6 +83,6 @@ uint32_t extract_crc(const uint8_t *buf, uint32_t data_length) {
   return crc;
 }
 
-bool is_crc_pass(const uint8_t *buf, uint32_t len) {
+bool crc_ok(const uint8_t *buf, uint32_t len) {
   return soft_crc32(buf, len - 4) == extract_crc(buf, len);
 }
