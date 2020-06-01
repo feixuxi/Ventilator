@@ -7,22 +7,22 @@
 char r[20];
 
 class DummyTxListener : public TxListener {
-  void onTxComplete() { debugPrint("$"); }
-  void onTxError() { debugPrint("E"); };
+  void onTxComplete() { debug.Print("$"); }
+  void onTxError() { debug.Print("E"); };
 };
 
 class DummyRxListener : public RxListener {
 public:
   void onRxComplete() {
-    debugPrint("&");
-    debugPrint(r);
+    debug.Print("&");
+    debug.Print(r);
   }
-  void onCharacterMatch() { debugPrint("@"); }
+  void onCharacterMatch() { debug.Print("@"); }
   void onRxError(RxError_t e) {
     if (RX_ERROR_TIMEOUT == e) {
-      debugPrint("T");
+      debug.Print("T");
     } else {
-      debugPrint("#");
+      debug.Print("#");
     };
   }
 };
@@ -42,28 +42,28 @@ int main() {
   Hal.init();
   dmaController.init();
 
-  debugPrint("*");
+  debug.Print("*");
   char s[] = "ping ping ping ping ping ping ping ping ping ping ping ping\n";
   bool dmaStarted = false;
 
   dmaStarted = uart_dma.startTX((uint8_t *)s, strlen(s), &txlistener);
   if (dmaStarted) {
-    debugPrint("!");
+    debug.Print("!");
   }
 
   uart_dma.charMatchEnable();
 
   dmaStarted = uart_dma.startRX((uint8_t *)r, 10, 115200 * 2, &rxlistener);
   if (dmaStarted) {
-    debugPrint("!");
+    debug.Print("!");
   }
 
   while (1) {
     Hal.watchdog_handler();
-    char i[1];
-    if (1 == debugRead(i, 1)) {
-      Hal.reset_device();
-    }
+    // char i[1];
+    // if (1 == debugRead(i, 1)) {
+    //   Hal.reset_device();
+    // }
     Hal.delay(milliseconds(10));
   }
 }
