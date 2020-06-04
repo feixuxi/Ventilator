@@ -88,11 +88,13 @@ static constexpr int oversample_count = 1 << oversample_log2;
 
 // This calculated constant gives the maximum A/D reading based on the
 // number of samples.
+// See 16.4.30: Oversampler (pg 425)
 static constexpr int max_adc_reading =
     (oversample_log2 >= 4) ? 65536 : (1 << (12 + oversample_log2));
 
 // A/D sample time in CPU clock cycles.  Fixed for now
 // This is the time we give the analog input to charge the A/D sampling cap.
+// See 16.4.12: Channel-wise programmable sampling time (pg 389)
 static constexpr int adc_samp_time = 92;
 
 // Time of an A/D conversion in CPU clock cycles.  This is the sample time + 13
@@ -146,6 +148,16 @@ void HalApi::InitADC() {
   // I'll wait for 30 just to be extra conservative
   BusyWaitUsec(30);
 
+  /* 16.4.8: Software procedure to calibrate the ADC (pg. 384)
+    1. Ensure DEEPPWD=0, ADVREGEN=1 and that ADC voltage regulator startup time has elapsed.
+    2. Ensure that ADEN=0.
+    3. Select the input mode for this calibration by setting ADCALDIF=0 (single-ended input)
+      or ADCALDIF=1 (differential input).
+    4. Set ADCAL=1.
+    5. Wait until ADCAL=0.
+    6. The calibration factor can be read from ADC_CALFACT register.
+  */
+    
   // Calibrate the A/D for single ended channels
   adc->adc[0].ctrl |= 0x80000000;
 
@@ -157,6 +169,14 @@ void HalApi::InitADC() {
   // Clear all the status bits
   adc->adc[0].stat = 0x3FF;
 
+  /* 16.4.9: ADC on-off control (ADEN, ADDIS, ADRDY) (pg 386)
+    1. Clear the ADRDY bit in the ADC_ISR register by writing ‘1’.
+    2. Set ADEN=1.
+    3. Wait until ADRDY=1 (ADRDY is set after the ADC startup time). This can be done
+      using the associated interrupt (setting ADRDYIE=1).
+    4. Clear the ADRDY bit in the ADC_ISR register by writing ‘1’ (optional).
+  */
+    
   // Enable the A/D
   adc->adc[0].ctrl |= 0x00000001;
 
@@ -182,6 +202,7 @@ void HalApi::InitADC() {
   adc->adc[0].cfg2.ovss = (oversample_log2 < 4) ? 0 : (oversample_log2 - 4);
 
   // Set sample time. I'm using 92.5 A/D clocks to sample.
+  // See 16.4.12: Channel-wise programmable sampling time (pg 389)
   static_assert(adc_samp_time == 92);
   adc->adc[0].samp.smp5 = 5;
   adc->adc[0].samp.smp6 = 5;
@@ -189,6 +210,7 @@ void HalApi::InitADC() {
   adc->adc[0].samp.smp15 = 5;
 
   // Set the conversion sequence
+  // See 16.6.11: ADC regular sequence register 1 (ADC_SQR1) (pg 468)
   adc->adc[0].seq.len = adc_channels - 1;
   adc->adc[0].seq.sq1 = 6;
   adc->adc[0].seq.sq2 = 9;
