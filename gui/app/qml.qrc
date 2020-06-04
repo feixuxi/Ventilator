@@ -27,5 +27,6 @@
         <file>fonts/Oxygen-Light.ttf</file>
         <file>fonts/Oxygen-Regular.ttf</file>
         <file>controls/ParameterDisplay.qml</file>
+        <file>controls/DeviceStatusDisplay.qml</file>
     </qresource>
 </RCC>

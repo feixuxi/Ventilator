@@ -18,6 +18,21 @@
 #include <iostream>
 #include <memory>
 
+#include "batteryinfo.h"
+#include "simple_clock.h"
+
+QObject *clockInstance(QQmlEngine *engine, QJSEngine *scriptEngine) {
+  Q_UNUSED(engine);
+  Q_UNUSED(scriptEngine);
+  return new SimpleClock();
+}
+
+QObject *batteryInstance(QQmlEngine *engine, QJSEngine *scriptEngine) {
+  Q_UNUSED(engine);
+  Q_UNUSED(scriptEngine);
+  return new BatteryInfo();
+}
+
 void install_fonts() {
   if (QFontDatabase::addApplicationFont(":/fonts/NotoSans-Regular.ttf") == -1)
     qWarning() << "Failed to load NatoSans-Regular.ttf";
@@ -103,6 +118,11 @@ int main(int argc, char *argv[]) {
     device->SendGuiStatus(state_container.GetGuiStatus());
   });
   communicate.Start();
+
+  qmlRegisterSingletonType<SimpleClock>("Respira", 1, 0, "SimpleClock",
+                                        &clockInstance);
+  qmlRegisterSingletonType<BatteryInfo>("Respira", 1, 0, "BatteryInfo",
+                                        &batteryInstance);
 
   QQmlApplicationEngine engine;
   engine.rootContext()->setContextProperty("guiState", &state_container);

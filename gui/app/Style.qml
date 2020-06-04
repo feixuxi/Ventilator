@@ -45,46 +45,46 @@ QtObject {
 
             // Font for number display on the stepped button
             property font headerButton: Qt.font({
-                family: "Noto Sans",
-                pointSize: 20,
-                letterSpacing: 0,
-                weight: Font.Normal
-            })
+                                                    family: "Noto Sans",
+                                                    pointSize: 20,
+                                                    letterSpacing: 0,
+                                                    weight: Font.Normal
+                                                })
 
             property font parameterButton: Qt.font({
-                family: "Noto Sans",
-                pointSize: 20,
-                letterSpacing: 0,
-                weight: Font.Normal
-            })
+                                                       family: "Noto Sans",
+                                                       pointSize: 20,
+                                                       letterSpacing: 0,
+                                                       weight: Font.Normal
+                                                   })
 
             property font parameterButtonNotation: Qt.font({
-                family: "Noto Sans",
-                pointSize: 16,
-                letterSpacing: 0,
-                weight: Font.Normal
-            })
+                                                               family: "Noto Sans",
+                                                               pointSize: 16,
+                                                               letterSpacing: 0,
+                                                               weight: Font.Normal
+                                                           })
 
             property font parameterButtonValue: Qt.font({
-                family: "Oxygen",
-                pointSize: 48,
-                letterSpacing: 0,
-                weight: Font.Normal
-            })
+                                                            family: "Oxygen",
+                                                            pointSize: 48,
+                                                            letterSpacing: 0,
+                                                            weight: Font.Normal
+                                                        })
 
             property font parameterDisplay: Qt.font({
-                family: "Noto Sans",
-                pointSize: 16,
-                letterSpacing: 0,
-                weight: Font.Normal
-            })
+                                                        family: "Noto Sans",
+                                                        pointSize: 16,
+                                                        letterSpacing: 0,
+                                                        weight: Font.Normal
+                                                    })
 
             property font parameterDisplayValue: Qt.font({
-                family: "Oxygen",
-                pointSize: 48,
-                letterSpacing: 0,
-                weight: Font.Normal
-            })
+                                                             family: "Oxygen",
+                                                             pointSize: 48,
+                                                             letterSpacing: 0,
+                                                             weight: Font.Normal
+                                                         })
         }
 
     }
@@ -97,9 +97,17 @@ QtObject {
 
     // Font for number display on the stepped button
     property font stepButtonFont: Qt.font({
-        family: "Times New Roman",
-        weight: Font.DemiBold,
-        bold: true,
-        pixelSize: 38
-    })
+                                              family: "Times New Roman",
+                                              weight: Font.DemiBold,
+                                              bold: true,
+                                              pixelSize: 38
+                                          })
+
+    // Font for number display on the stepped button
+    property font clockFont: Qt.font({
+                                         family: "Noto Sans",
+                                         pointSize: 16,
+                                         letterSpacing: 0,
+                                         weight: Font.Normal
+                                     })
 }

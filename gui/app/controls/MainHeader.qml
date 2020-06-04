@@ -4,6 +4,10 @@ import QtQuick.Controls 2.4
 
 import ".."
 
+/*!
+    \qmltype MainHeader
+    \brief Top screen header containing menu, mode selection and alarm buttons.
+*/
 Control {
 
     width: 784; height: 64
