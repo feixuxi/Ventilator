@@ -22,7 +22,7 @@ Row {
             id: time
             text: format(SimpleClock.hour, SimpleClock.minute)
             font: Style.clockFont
-            color: "white"
+            color: Style.theme.color.textPrimary
 
             function format(hour, minute) {
                 var twelveHour = hour > 12 ? hour -12 : hour
@@ -42,7 +42,7 @@ Row {
         Text {
             id: period
             font: Style.clockFont
-            color: "#AFAFAF"
+            color: Style.theme.color.textAlternative
             text: SimpleClock.hour >= 12 ? "PM" : "AM"
         }
     }
@@ -50,7 +50,7 @@ Row {
     Text {
         width: 8; height: 22
         font: Style.clockFont
-        color: "white"
+        color: Style.theme.color.textPrimary
         text: "•"
     }
 
@@ -61,13 +61,13 @@ Row {
         Text {
             text: BatteryInfo.percentage.toString()
             font: Style.clockFont
-            color: "white"
+            color: Style.theme.color.textPrimary
         }
 
         Text {
             text: "%"
             font: Style.clockFont
-            color: "#AFAFAF"
+            color: Style.theme.color.textAlternative
         }
 
         Item { width: 2; height: 1 }

@@ -27,61 +27,87 @@ QtObject {
     property var darkTheme: QtObject {
 
         property QtObject color: QtObject {
+            property color textPrimary: "white"
+            property color textAlternative: "#AFAFAF"
             property color primary: "#466eeb"
             property color windowBackground: "#000713"
-            property color modalBackground: "black"
+            property color modalBackground: "#000B14"
             property color modalHeaderColor: "#1056A1"
-            property color modalButton: "#132D4D"
-            property color modalButtonHighlighted: "#498CCD"
+            property color modalButton: "#192F42"
+            property color modalButtonHighlighted: "#0056A1"
 
             property color headerButton: "#192F42"
             property color headerButtonHighlighted: "#0056A1"
-
-            property color radioButtonColor: "white"
-            property color radioButtonHighlightedColor: "red"
         }
 
         property QtObject font: QtObject {
 
-            // Font for number display on the stepped button
+            property font modalButton: Qt.font({
+                                                    family: "Noto Sans",
+                                                    pixelSize: 32,
+                                                    letterSpacing: 0,
+                                                    weight: Font.Normal
+                                                })
+
+            property font modalHeader: Qt.font({
+                                                    family: "Noto Sans",
+                                                    pixelSize: 48,
+                                                    letterSpacing: 0,
+                                                    weight: Font.Normal
+                                                })
+
+            property font modalTitle: Qt.font({
+                                                    family: "Noto Sans",
+                                                    pixelSize: 20,
+                                                    letterSpacing: 0,
+                                                    weight: Font.Normal
+                                                })
+
+            property font modalContent: Qt.font({
+                                                    family: "Noto Sans",
+                                                    pixelSize: 16,
+                                                    letterSpacing: 0,
+                                                    weight: Font.Normal
+                                                })
+
             property font headerButton: Qt.font({
                                                     family: "Noto Sans",
-                                                    pointSize: 20,
+                                                    pixelSize: 20,
                                                     letterSpacing: 0,
                                                     weight: Font.Normal
                                                 })
 
             property font parameterButton: Qt.font({
                                                        family: "Noto Sans",
-                                                       pointSize: 20,
+                                                       pixelSize: 20,
                                                        letterSpacing: 0,
                                                        weight: Font.Normal
                                                    })
 
             property font parameterButtonNotation: Qt.font({
                                                                family: "Noto Sans",
-                                                               pointSize: 16,
+                                                               pixelSize: 16,
                                                                letterSpacing: 0,
                                                                weight: Font.Normal
                                                            })
 
             property font parameterButtonValue: Qt.font({
                                                             family: "Oxygen",
-                                                            pointSize: 48,
+                                                            pixelSize: 48,
                                                             letterSpacing: 0,
                                                             weight: Font.Normal
                                                         })
 
             property font parameterDisplay: Qt.font({
                                                         family: "Noto Sans",
-                                                        pointSize: 16,
+                                                        pixelSize: 16,
                                                         letterSpacing: 0,
                                                         weight: Font.Normal
                                                     })
 
             property font parameterDisplayValue: Qt.font({
                                                              family: "Oxygen",
-                                                             pointSize: 48,
+                                                             pixelSize: 48,
                                                              letterSpacing: 0,
                                                              weight: Font.Normal
                                                          })
@@ -106,7 +132,7 @@ QtObject {
     // Font for number display on the stepped button
     property font clockFont: Qt.font({
                                          family: "Noto Sans",
-                                         pointSize: 16,
+                                         pixelSize: 16,
                                          letterSpacing: 0,
                                          weight: Font.Normal
                                      })

@@ -43,7 +43,7 @@ Button {
             }
             textFormat: Text.AutoText
             font: Style.theme.font.parameterButton
-            color: "white"
+            color: Style.theme.color.textPrimary
             horizontalAlignment: Text.AlignLeft
             verticalAlignment: Text.AlignVCenter
             elide: Text.ElideRight
@@ -56,7 +56,7 @@ Button {
                 left: parent.left; leftMargin: 8
             }
             textFormat: Text.AutoText
-            color: "#AFAFAF"
+            color: Style.theme.color.textAlternative
             font: Style.theme.font.parameterButtonNotation
             horizontalAlignment: Text.AlignLeft
             verticalAlignment: Text.AlignVCenter
@@ -71,7 +71,7 @@ Button {
                 right: parent.right; rightMargin: 8
             }
             textFormat: Text.AutoText
-            color: "white"
+            color: Style.theme.color.textPrimary
             font: Style.theme.font.parameterButtonValue
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter

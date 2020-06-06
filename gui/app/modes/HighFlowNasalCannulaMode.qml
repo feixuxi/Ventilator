@@ -9,7 +9,7 @@ Mode {
     Text {
         anchors.centerIn: parent
         text: "High Flow Nasal Cannula Mode"
-        color: "white"
+        color: Style.theme.color.textPrimary
         font.pointSize: 38
     }
 
