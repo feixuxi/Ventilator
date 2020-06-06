@@ -43,25 +43,25 @@ QtObject {
         property QtObject font: QtObject {
 
             property font modalButton: Qt.font({
-                                                    family: "Noto Sans",
-                                                    pixelSize: 32,
-                                                    letterSpacing: 0,
-                                                    weight: Font.Normal
-                                                })
+                                                   family: "Noto Sans",
+                                                   pixelSize: 32,
+                                                   letterSpacing: 0,
+                                                   weight: Font.Normal
+                                               })
 
             property font modalHeader: Qt.font({
-                                                    family: "Noto Sans",
-                                                    pixelSize: 48,
-                                                    letterSpacing: 0,
-                                                    weight: Font.Normal
-                                                })
+                                                   family: "Noto Sans",
+                                                   pixelSize: 48,
+                                                   letterSpacing: 0,
+                                                   weight: Font.Normal
+                                               })
 
             property font modalTitle: Qt.font({
-                                                    family: "Noto Sans",
-                                                    pixelSize: 20,
-                                                    letterSpacing: 0,
-                                                    weight: Font.Normal
-                                                })
+                                                  family: "Noto Sans",
+                                                  pixelSize: 20,
+                                                  letterSpacing: 0,
+                                                  weight: Font.Normal
+                                              })
 
             property font modalContent: Qt.font({
                                                     family: "Noto Sans",
@@ -111,6 +111,13 @@ QtObject {
                                                              letterSpacing: 0,
                                                              weight: Font.Normal
                                                          })
+
+            property font graphLabel: Qt.font({
+                                                  family: "Oxygen",
+                                                  pixelSize: 16,
+                                                  letterSpacing: 0,
+                                                  weight: Font.Normal
+                                              })
         }
 
     }
