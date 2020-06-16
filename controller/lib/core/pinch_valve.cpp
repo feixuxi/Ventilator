@@ -197,7 +197,7 @@ void PinchValve::SetOutput(float value) {
 
   value = std::clamp(value, 0.0f, 1.0f);
 
-  /*
+  
   // Number of intervals defined by the table.
   float tbl_len = std::size(flow_table) - 1;
 
@@ -210,7 +210,7 @@ void PinchValve::SetOutput(float value) {
     value = flow_table[n];
   else
     value = flow_table[n] + f * (flow_table[n + 1] - flow_table[n]);
-  */
+  
   // Convert the value to an absolute position in deg
   // The motor's zero position is at the home offset
   // which corresponds to fully open (i.e. 100% flow)

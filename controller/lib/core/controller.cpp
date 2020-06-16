@@ -27,12 +27,17 @@ static constexpr Duration LOOP_PERIOD = milliseconds(10);
 // =============================================================================
 static DebugFloat dbg_blower_valve_kp("blower_valve_kp",
                                       "Proportional gain for blower valve PID",
-                                      0.7f);
+                                      0.4f);
 static DebugFloat dbg_blower_valve_ki("blower_valve_ki",
                                       "Integral gain for blower valve PID",
-                                      1.0f);
+                                      20.0f);
 static DebugFloat dbg_blower_valve_kd("blower_valve_kd",
                                       "Derivative gain for blower valve PID");
+									  
+//Edwin's additions
+static DebugFloat blower_power( "blower_power", "blower power during gui mode 0, 0-1", 0.0f);
+static DebugFloat exh_valve_pos( "exh_valve_pos", "exhale valve posoition during gui mode 0, 0-1", 0.0f);
+static DebugFloat inh_valve_pos( "inh_valve_pos", "inhale valve posoition during gui mode 0, 0-1", 1.0f);
 
 // In an ideal world we'd fully close the exhale valve during inhale, so as not
 // to waste any oxygen.  In practice having the valve be somewhat open is
@@ -115,9 +120,9 @@ Controller::Run(Time now, const VentParams &params,
 
     actuators_state = {
         .fio2_valve = 0,
-        .blower_power = 0,
-        .blower_valve = 0,
-        .exhale_valve = 1,
+        .blower_power = blower_power.Get(),
+        .blower_valve = inh_valve_pos.Get(),
+        .exhale_valve = exh_valve_pos.Get(),
     };
     ventilator_was_on_ = false;
   } else {
