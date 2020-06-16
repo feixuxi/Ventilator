@@ -24,10 +24,10 @@ static constexpr Duration LOOP_PERIOD = milliseconds(10);
 // Inputs - set from external debug program, read but never modified here.
 static DebugFloat dbg_blower_valve_kp("blower_valve_kp",
                                       "Proportional gain for blower valve PID",
-                                      0.4f);
+                                      0.7f);
 static DebugFloat dbg_blower_valve_ki("blower_valve_ki",
                                       "Integral gain for blower valve PID",
-                                      20.0f);
+                                      1.0f);
 static DebugFloat dbg_blower_valve_kd("blower_valve_kd",
                                       "Derivative gain for blower valve PID");
 
@@ -46,13 +46,6 @@ static DebugFloat dbg_volume_uncorrected("uncorrected_volume",
                                          "Patient volume w/o correction, ml");
 static DebugFloat dbg_flow_correction("flow_correction",
                                       "Correction to flow, cc/sec");
-
-//stuff added by Edwin
-static DebugFloat mtr_pos_exh( "mtr_pos_exh", "exhale valve position while in gui_mode 0, 0-1" );
-static DebugFloat mtr_pos_inh( "mtr_pos_inh", "inhale valve position while in gui_mode 0, 0-1" );
-static DebugFloat blower_power( "blower_power", "blower power while in gui_mode 0, 0-1" );
-static DebugFloat exh_pos_PIP( "exh_pos_PIP", "exhale valve position during PIP, 0-1", 0.197f );
-static DebugFloat exh_pos_PEEP( "exh_pos_PEEP", "exhale valve position during PEEP, 0-1", 1.0f );
 
 Controller::Controller()
     : blower_valve_pid_(dbg_blower_valve_kp.Get(), dbg_blower_valve_ki.Get(),
@@ -106,12 +99,9 @@ Controller::Run(Time now, const VentParams &params,
 
     actuators_state = {
         .fio2_valve = 0,
-//        .blower_power = 0,
-		.blower_power = blower_power.Get(),
-//        .blower_valve = 0,
-        .blower_valve = mtr_pos_inh.Get(),
-        //.exhale_valve = 1,
-		.exhale_valve = mtr_pos_exh.Get(),
+        .blower_power = 0,
+        .blower_valve = 0,
+        .exhale_valve = 1,
     };
   } else {
     // Start controlling pressure.
@@ -124,7 +114,7 @@ Controller::Run(Time now, const VentParams &params,
             now, sensor_readings.patient_pressure.kPa(),
             desired_state.pressure_setpoint->kPa()),
         .exhale_valve =
-            desired_state.flow_direction == FlowDirection::EXPIRATORY ? exh_pos_PEEP.Get() : exh_pos_PIP.Get(),
+            desired_state.flow_direction == FlowDirection::EXPIRATORY ? 1 : 0,
     };
   }
 

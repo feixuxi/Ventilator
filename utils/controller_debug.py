@@ -15,7 +15,7 @@ import json
 import math
 import matplotlib.pyplot as plt
 import os
-import readline
+#import readline
 import serial
 import struct
 import subprocess
