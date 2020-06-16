@@ -5,10 +5,10 @@
 #include "periodic_closure.h"
 #include "respira_connected_device.h"
 
-#include <QApplication>
 #include <QCommandLineParser>
 #include <QFontDatabase>
 #include <QFontInfo>
+#include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QtCore/QDir>
 #include <QtQml/QQmlContext>
@@ -18,7 +18,7 @@
 #include <iostream>
 #include <memory>
 
-#include "simple_clock.h"
+#include "time_series_graph.h"
 
 QObject *gui_state_instance(QQmlEngine *engine, QJSEngine *scriptEngine) {
   static GuiStateContainer state_container(
@@ -44,8 +44,7 @@ void install_fonts() {
 }
 
 int main(int argc, char *argv[]) {
-
-  QApplication app(argc, argv);
+  QGuiApplication app(argc, argv);
 
   app.setWindowIcon(QIcon(":/images/Logo.png"));
 
@@ -61,7 +60,8 @@ int main(int argc, char *argv[]) {
 
   QCommandLineOption serialPortOption(
       QStringList() << "serial-port",
-      QObject::tr("main", "Serial port filename. Uses fake data if not set."));
+      QObject::tr("main", "Serial port filename. "
+                          "Uses pre-recorded test data if not set."));
   serialPortOption.setValueName("port");
 
   parser.addOption(startupOnlyOption);
@@ -70,7 +70,6 @@ int main(int argc, char *argv[]) {
 
   GuiStateContainer *state_container =
       static_cast<GuiStateContainer *>(gui_state_instance(nullptr, nullptr));
-  auto startup_time = state_container->GetStartupTime();
   // Check out utils/mock-cycle-controller.py - it is
   // a script that bangs ControllerState at the set rate into serial
   // port.
@@ -80,44 +79,82 @@ int main(int argc, char *argv[]) {
     device = std::make_unique<RespiraConnectedDevice>(
         parser.value(serialPortOption));
   } else {
+    // NOTE: The code below is specialized to this particular file.
+    // The file also does not match the default (or, of course, current) mode
+    // settings: settings used in the file are PIP 15, PEEP 5, RR 12, IE 2/3.
+    std::vector<ControllerStatus> statuses;
+    QFile file(":/sample-data/2020-05-14-pip15-peep5-rr12-ie23.csv");
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+      std::cerr << "Failed to open sample data file";
+      return 1;
+    }
+    int breath_id = 0;
+    bool last_setpoint_was_5 = false;
+    while (!file.atEnd()) {
+      QString line{file.readLine()};
+      line = line.trimmed();
+      if (line.isEmpty() || line.startsWith("#"))
+        continue;
+      auto tokens = line.split(",").toVector();
+
+      float fan_setpoint_cm_h2o = tokens[0].toFloat();
+      if (fan_setpoint_cm_h2o == 5.0f) {
+        if (!last_setpoint_was_5)
+          breath_id++;
+        last_setpoint_was_5 = true;
+      } else {
+        last_setpoint_was_5 = false;
+      }
+
+      ControllerStatus status = ControllerStatus_init_zero;
+      status.sensor_readings.patient_pressure_cm_h2o = tokens[1].toFloat();
+      status.sensor_readings.flow_ml_per_min = 1000 * tokens[4].toFloat();
+      status.sensor_readings.volume_ml = 10 * tokens[5].toFloat();
+      // TODO(jkff) Wait until
+      // https://github.com/RespiraWorks/VentilatorSoftware/pull/519
+      // status.sensor_readings.breath_id = breath_id,
+      statuses.push_back(status);
+    }
+
+    SteadyInstant base = SteadyClock::now();
     device = std::make_unique<FakeConnectedDevice>(
         [&](const GuiStatus &gui_status) {
           // For now, completely ignore gui_status.
           (void)gui_status;
-          /* std::cout << "uptime_ms = " << gui_status.uptime_ms << ", "
-          << "desired_params = {"
-          << "mode = " << gui_status.desired_params.mode << ", "
-          << "peep = " << gui_status.desired_params.peep_cm_h2o << ", "
-          << "rr = " << gui_status.desired_params.breaths_per_min << ", "
-          << "pip = " << gui_status.desired_params.pip_cm_h2o << ", "
-          << "ier = " <<
-          gui_status.desired_params.inspiratory_expiratory_ratio
-          << "}" << std::endl; */
         },
-        [&](ControllerStatus *controller_status) {
-          // Fill the status with fake data.
-          controller_status->uptime_ms =
-              TimeAMinusB(SteadyClock::now(), startup_time).count();
-          auto *sensors = &controller_status->sensor_readings;
-          sensors->patient_pressure_cm_h2o =
-              15 + 10 * sin(controller_status->uptime_ms * 0.001);
-          sensors->flow_ml_per_min =
-              120 * sin(controller_status->uptime_ms * 0.003);
-          sensors->volume_ml =
-              1000 + 500 * sin(controller_status->uptime_ms * 0.002);
+        [statuses, base](ControllerStatus *controller_status) {
+          DurationMs elapsed = TimeAMinusB(SteadyClock::now(), base);
+          // Lines in this file are 10ms apart.
+          int i_status = elapsed.count() / 10;
+          *controller_status = statuses[i_status % statuses.size()];
         });
   }
 
   // Run comm thread at the same time interval as Cycle Controller.
+  std::mutex gui_status_mutex;
+  GuiStatus gui_status = state_container->GetGuiStatus();
+  QObject::connect(state_container, &GuiStateContainer::params_changed, [&]() {
+    std::unique_lock<std::mutex> l(gui_status_mutex);
+    gui_status = state_container->GetGuiStatus();
+  });
   PeriodicClosure communicate(DurationMs(30), [&] {
+    auto now = SteadyClock::now();
     ControllerStatus controller_status;
     if (device->ReceiveControllerStatus(&controller_status)) {
-      state_container->AppendHistory(controller_status);
+      QMetaObject::invokeMethod(state_container, [=]() {
+        state_container->controller_status_changed(now, controller_status);
+      });
     }
-    device->SendGuiStatus(state_container->GetGuiStatus());
+    GuiStatus status;
+    {
+      std::unique_lock<std::mutex> l(gui_status_mutex);
+      status = gui_status;
+    }
+    device->SendGuiStatus(status);
   });
   communicate.Start();
 
+  qmlRegisterType<TimeSeriesGraph>("Respira", 1, 0, "TimeSeriesGraph");
   qmlRegisterSingletonType<GuiStateContainer>(
       "Respira", 1, 0, "GuiStateContainer", &gui_state_instance);
 

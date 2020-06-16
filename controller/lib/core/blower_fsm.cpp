@@ -143,14 +143,12 @@ BlowerSystemState BlowerFsm::DesiredState(Time now, const VentParams &params,
 
   std::visit([&](auto &fsm) { return fsm.Update(now, inputs); }, fsm_);
 
-  if ((params.mode == VentMode_OFF && !std::holds_alternative<OffFsm>(fsm_)) ||
+  if (params.mode == VentMode_OFF ||
       std::visit([&](auto &fsm) { return fsm.Finished(); }, fsm_)) {
-    // Set is_new_breath to true even when the ventilator transitions from on
-    // to off.  It's a little arbitrary, but for the most part, is_new_breath
-    // is used to mark breath boundaries rather than simply signal the
-    // beginning of a breath, and it would be weird if the last breath before
-    // turning off the ventilator appeared to continue indefinitely.
-    is_new_breath = true;
+    // For the purpose of is_new_breath, treat multiple occurrences of OffFsm
+    // as a "single breath".
+    is_new_breath = !std::holds_alternative<OffFsm>(fsm_);
+
     switch (params.mode) {
     case VentMode_OFF:
       fsm_.emplace<OffFsm>(now, params);
@@ -160,6 +158,9 @@ BlowerSystemState BlowerFsm::DesiredState(Time now, const VentParams &params,
       break;
     case VentMode_PRESSURE_ASSIST:
       fsm_.emplace<PressureAssistFsm>(now, params);
+      break;
+    case VentMode_HIGH_FLOW_NASAL_CANNULA:
+      // TODO: Implement me. For now, keep mode unchanged.
       break;
     }
   }

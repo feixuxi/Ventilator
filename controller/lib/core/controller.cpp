@@ -84,6 +84,7 @@ Controller::Run(Time now, const VentParams &params,
   if (desired_state.is_new_breath) {
     // The "correct" volume at the breath boundary is 0.
     flow_integrator_->NoteExpectedVolume(ml(0));
+    breath_id_ = now.microsSinceStartup();
   }
 
   ActuatorsState actuators_state;
@@ -97,13 +98,6 @@ Controller::Run(Time now, const VentParams &params,
     // them to the desired positions.
     blower_valve_pid_.Reset();
 
-    // Reset the two flow integrators, forcing volume to 0.
-    //
-    // TODO: This isn't ideal; if the blower is off, we should still be able to
-    // report volume.
-    flow_integrator_.emplace();
-    uncorrected_flow_integrator_.emplace();
-
     actuators_state = {
         .fio2_valve = 0,
 //        .blower_power = 0,
@@ -113,7 +107,13 @@ Controller::Run(Time now, const VentParams &params,
         //.exhale_valve = 1,
 		.exhale_valve = mtr_pos_exh.Get(),
     };
+    ventilator_was_on_ = false;
   } else {
+    if (!ventilator_was_on_) {
+      // reset volume integrators
+      flow_integrator_.emplace();
+      uncorrected_flow_integrator_.emplace();
+    }
     // Start controlling pressure.
     actuators_state = {
         .fio2_valve = 0, // not used yet
@@ -126,12 +126,14 @@ Controller::Run(Time now, const VentParams &params,
         .exhale_valve =
             desired_state.flow_direction == FlowDirection::EXPIRATORY ? exh_pos_PEEP.Get() : exh_pos_PIP.Get(),
     };
+    ventilator_was_on_ = true;
   }
 
   ControllerState controller_state = {
       .pressure_setpoint = desired_state.pressure_setpoint.value_or(kPa(0)),
       .patient_volume = patient_volume,
       .net_flow = net_flow,
+      .breath_id = breath_id_,
   };
 
   dbg_sp.Set(desired_state.pressure_setpoint.value_or(kPa(0)).cmH2O());
