@@ -15,27 +15,49 @@ limitations under the License.
 
 #include "controller.h"
 
+#include "fan_pressures.h"
 #include "pid.h"
 #include "vars.h"
 #include <math.h>
 
 static constexpr Duration LOOP_PERIOD = milliseconds(10);
 
+// =============================================================================
 // Inputs - set from external debug program, read but never modified here.
+// =============================================================================
 static DebugFloat dbg_blower_valve_kp("blower_valve_kp",
                                       "Proportional gain for blower valve PID",
-                                      0.4f);
+                                      0.7f);
 static DebugFloat dbg_blower_valve_ki("blower_valve_ki",
                                       "Integral gain for blower valve PID",
-                                      20.0f);
+                                      1.0f);
 static DebugFloat dbg_blower_valve_kd("blower_valve_kd",
                                       "Derivative gain for blower valve PID");
 
+// In an ideal world we'd fully close the exhale valve during inhale, so as not
+// to waste any oxygen.  In practice having the valve be somewhat open is
+// helpful for the following reasons.
+//
+//  - If the exhale valve is not open, then (modulo leakage) pressure can never
+//    go down.  This means that if our control overshoots, we can't recover.
+//
+//  - With the blower at full speed, there's some leakage through the inhale
+//    pinch valve even when it's fully closed.  This means that pressure may
+//    continue to increase once we hit PIP -- unless we have an outlet for that
+//    pressure.
+static DebugFloat dbg_exhale_valve_on_pip(
+    "exhale_valve_on_pip",
+    "Position of exhale valve [0 = closed, to 1 = open] during inhale.", 0.3f);
+
+// =============================================================================
 // Unchanging outputs - read from external debug program, never modified here.
+// =============================================================================
 static DebugUInt32 dbg_per("loop_period", "Loop period, read-only (usec)",
                            static_cast<uint32_t>(LOOP_PERIOD.microseconds()));
 
+// =============================================================================
 // Outputs - read from external debug program, modified here.
+// =============================================================================
 static DebugFloat dbg_sp("pc_setpoint", "Pressure control setpoint (cmH2O)");
 static DebugFloat dbg_net_flow("net_flow", "Net flow rate, cc/sec");
 static DebugFloat dbg_volume("volume", "Patient volume, ml");
@@ -46,13 +68,6 @@ static DebugFloat dbg_volume_uncorrected("uncorrected_volume",
                                          "Patient volume w/o correction, ml");
 static DebugFloat dbg_flow_correction("flow_correction",
                                       "Correction to flow, cc/sec");
-
-//stuff added by Edwin
-static DebugFloat mtr_pos_exh( "mtr_pos_exh", "exhale valve position while in gui_mode 0, 0-1" );
-static DebugFloat mtr_pos_inh( "mtr_pos_inh", "inhale valve position while in gui_mode 0, 0-1" );
-static DebugFloat blower_power( "blower_power", "blower power while in gui_mode 0, 0-1" );
-static DebugFloat exh_pos_PIP( "exh_pos_PIP", "exhale valve position during PIP, 0-1", 0.197f );
-static DebugFloat exh_pos_PEEP( "exh_pos_PEEP", "exhale valve position during PEEP, 0-1", 1.0f );
 
 Controller::Controller()
     : blower_valve_pid_(dbg_blower_valve_kp.Get(), dbg_blower_valve_ki.Get(),
@@ -100,12 +115,9 @@ Controller::Run(Time now, const VentParams &params,
 
     actuators_state = {
         .fio2_valve = 0,
-//        .blower_power = 0,
-		.blower_power = blower_power.Get(),
-//        .blower_valve = 0,
-        .blower_valve = mtr_pos_inh.Get(),
-        //.exhale_valve = 1,
-		.exhale_valve = mtr_pos_exh.Get(),
+        .blower_power = 0,
+        .blower_valve = 0,
+        .exhale_valve = 1,
     };
     ventilator_was_on_ = false;
   } else {
@@ -117,14 +129,16 @@ Controller::Run(Time now, const VentParams &params,
     // Start controlling pressure.
     actuators_state = {
         .fio2_valve = 0, // not used yet
-        // In normal mode, blower is always full power; pid controls pressure by
-        // actuating the blower pinch valve.
-        .blower_power = 1,
+        // TODO: Add a comment.
+        // TODO: Make 10 cmH2O a DebugVar.
+        .blower_power = FanPowerFor(desired_state.max_pressure + cmH2O(10)),
         .blower_valve = blower_valve_pid_.Compute(
             now, sensor_readings.patient_pressure.kPa(),
             desired_state.pressure_setpoint->kPa()),
         .exhale_valve =
-            desired_state.flow_direction == FlowDirection::EXPIRATORY ? exh_pos_PEEP.Get() : exh_pos_PIP.Get(),
+            desired_state.flow_direction == FlowDirection::EXPIRATORY
+                ? 1
+                : dbg_exhale_valve_on_pip.Get(),
     };
     ventilator_was_on_ = true;
   }

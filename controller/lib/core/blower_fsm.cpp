@@ -68,9 +68,9 @@ void PressureControlFsm::Update(Time now, const BlowerFsmInputs &inputs) {
 
 BlowerSystemState PressureControlFsm::DesiredState() const {
   if (inspire_finished_) {
-    return {expire_pressure_, FlowDirection::EXPIRATORY};
+    return {expire_pressure_, inspire_pressure_, FlowDirection::EXPIRATORY};
   }
-  return {setpoint_, FlowDirection::INSPIRATORY};
+  return {setpoint_, inspire_pressure_, FlowDirection::INSPIRATORY};
 }
 
 PressureAssistFsm::PressureAssistFsm(Time now, const VentParams &params)
@@ -99,9 +99,9 @@ void PressureAssistFsm::Update(Time now, const BlowerFsmInputs &inputs) {
 
 BlowerSystemState PressureAssistFsm::DesiredState() const {
   if (inspire_finished_) {
-    return {expire_pressure_, FlowDirection::EXPIRATORY};
+    return {expire_pressure_, inspire_pressure_, FlowDirection::EXPIRATORY};
   }
-  return {setpoint_, FlowDirection::INSPIRATORY};
+  return {setpoint_, inspire_pressure_, FlowDirection::INSPIRATORY};
 }
 
 // TODO don't rely on fsm inner states to make this usable in any fsm
