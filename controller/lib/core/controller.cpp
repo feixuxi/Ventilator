@@ -24,10 +24,10 @@ static constexpr Duration LOOP_PERIOD = milliseconds(10);
 // Inputs - set from external debug program, read but never modified here.
 static DebugFloat dbg_blower_valve_kp("blower_valve_kp",
                                       "Proportional gain for blower valve PID",
-                                      0.7f);
+                                      1.5f);
 static DebugFloat dbg_blower_valve_ki("blower_valve_ki",
                                       "Integral gain for blower valve PID",
-                                      1.0f);
+                                      2.0f);
 static DebugFloat dbg_blower_valve_kd("blower_valve_kd",
                                       "Derivative gain for blower valve PID");
 
@@ -54,6 +54,42 @@ Controller::Controller()
                         /*output_max=*/1.0f) {}
 
 /*static*/ Duration Controller::GetLoopPeriod() { return LOOP_PERIOD; }
+
+static DebugFloat dbg_max_open("max_open",
+                               "maximum amount exhale valve is open during pip",
+                               0.7f);
+static DebugFloat
+    dbg_max_err("max_err", "maximum error before exhale valve starts to close",
+                5.0f);
+
+class PipExhale {
+  float last_val{0};
+
+public:
+  float Calculate(FlowDirection dir, float err) {
+    if (dir == FlowDirection::EXPIRATORY) {
+      last_val = 0;
+      return 1.0f;
+    }
+
+    float max_err = dbg_max_err.Get();
+    if (max_err < 1.0f)
+      max_err = 1.0f;
+
+    float val = err / max_err;
+    val = std::clamp(val, 0.0f, 1.0f);
+
+    val = 1.0f - err;
+    val *= dbg_max_open.Get();
+
+    if (val < last_val)
+      val = last_val;
+    last_val = val;
+
+    return val;
+  }
+};
+static PipExhale exhale_valve_ctrl;
 
 std::pair<ActuatorsState, ControllerState>
 Controller::Run(Time now, const VentParams &params,
@@ -113,8 +149,8 @@ Controller::Run(Time now, const VentParams &params,
         .blower_valve = blower_valve_pid_.Compute(
             now, sensor_readings.patient_pressure.kPa(),
             desired_state.pressure_setpoint->kPa()),
-        .exhale_valve =
-            desired_state.flow_direction == FlowDirection::EXPIRATORY ? 1 : 0,
+        .exhale_valve = exhale_valve_ctrl.Calculate(
+            desired_state.flow_direction, blower_valve_pid_.GetLastErr()),
     };
     ventilator_was_on_ = true;
   }
