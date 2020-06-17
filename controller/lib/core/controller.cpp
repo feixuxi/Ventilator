@@ -53,6 +53,9 @@ static DebugFloat inh_valve_pos( "inh_valve_pos", "inhale valve posoition during
 static DebugFloat dbg_exhale_valve_on_pip(
     "exhale_valve_on_pip",
     "Position of exhale valve [0 = closed, to 1 = open] during inhale.", 0.3f);
+static DebugFloat dbg_exhale_valve_on_peep(
+    "exhale_valve_on_peep",
+    "Position of exhale valve [0 = closed, to 1 = open] during inhale.", 1.0f);
 
 // =============================================================================
 // Unchanging outputs - read from external debug program, never modified here.
@@ -136,13 +139,13 @@ Controller::Run(Time now, const VentParams &params,
         .fio2_valve = 0, // not used yet
         // TODO: Add a comment.
         // TODO: Make 10 cmH2O a DebugVar.
-        .blower_power = FanPowerFor(desired_state.max_pressure + cmH2O(10)),
+        .blower_power = FanPowerFor(desired_state.max_pressure + cmH2O(20)),
         .blower_valve = blower_valve_pid_.Compute(
             now, sensor_readings.patient_pressure.kPa(),
             desired_state.pressure_setpoint->kPa()),
         .exhale_valve =
             desired_state.flow_direction == FlowDirection::EXPIRATORY
-                ? 1
+                ? dbg_exhale_valve_on_peep.Get()
                 : dbg_exhale_valve_on_pip.Get(),
     };
     ventilator_was_on_ = true;

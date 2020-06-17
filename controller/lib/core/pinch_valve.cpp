@@ -50,7 +50,7 @@ static constexpr float home_offset = 30.0f * move_dir;
 
 // This is the distance (deg) from the zero position until
 // the tube is completely shut.
-static constexpr float max_move = 50.0f * move_dir;
+static constexpr float max_move = 58.0f * move_dir;
 
 // Amplitude of power level for normal operation.
 // Don't go crazy here, you can easily overheat the

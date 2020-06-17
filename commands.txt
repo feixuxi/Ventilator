@@ -1,0 +1,2 @@
+pio run -t upload
+controller_debug --port COM12
