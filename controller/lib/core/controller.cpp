@@ -55,33 +55,43 @@ Controller::Controller()
 
 /*static*/ Duration Controller::GetLoopPeriod() { return LOOP_PERIOD; }
 
-static DebugFloat dbg_max_open("max_open",
-                               "maximum amount exhale valve is open during pip",
-                               0.7f);
 static DebugFloat
-    dbg_max_err("max_err", "maximum error before exhale valve starts to close",
-                5.0f);
+    dbg_exhale_max("exhale_valve_max_open",
+                   "maximum amount exhale valve is open during pip", 0.9f);
+static DebugFloat
+    dbg_exhale_start("exhale_valve_start",
+                     "Pressure error where exhale valve starts to close",
+                     10.0f);
 
 class PipExhale {
   float last_val{0};
 
 public:
-  float Calculate(FlowDirection dir, float err) {
-    if (dir == FlowDirection::EXPIRATORY) {
+  float Calculate(BlowerSystemState &desired_state, const VentParams &params,
+                  const SensorReadings &sensor_readings) {
+
+    if (desired_state.flow_direction == FlowDirection::EXPIRATORY) {
       last_val = 0;
       return 1.0f;
     }
 
-    float max_err = dbg_max_err.Get();
-    if (max_err < 1.0f)
-      max_err = 1.0f;
+    float start_err = dbg_exhale_start.Get();
+    if (start_err <= 0.0f)
+      return 0.0f;
 
-    float val = err / max_err;
-    val = std::clamp(val, 0.0f, 1.0f);
+    // Difference in cmH2O between PIP and current pressure
+    float err = static_cast<float>(params.pip_cm_h2o) -
+                sensor_readings.patient_pressure.cmH2O();
 
-    val = 1.0f - err;
-    val *= dbg_max_open.Get();
+    // We start opening when the error falls below start_err.
+    // We will be fully open (up to the exhale_max setting) when the error hits
+    // zero
+    float val = kPa(err).cmH2O() / start_err;
+    val = 1.0f - std::clamp(val, 0.0f, 1.0f);
 
+    val *= dbg_exhale_max.Get();
+
+    // Don't let this oscillate.  Once we open we don't close again
     if (val < last_val)
       val = last_val;
     last_val = val;
@@ -149,8 +159,8 @@ Controller::Run(Time now, const VentParams &params,
         .blower_valve = blower_valve_pid_.Compute(
             now, sensor_readings.patient_pressure.kPa(),
             desired_state.pressure_setpoint->kPa()),
-        .exhale_valve = exhale_valve_ctrl.Calculate(
-            desired_state.flow_direction, blower_valve_pid_.GetLastErr()),
+        .exhale_valve =
+            exhale_valve_ctrl.Calculate(desired_state, params, sensor_readings),
     };
     ventilator_was_on_ = true;
   }

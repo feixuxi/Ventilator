@@ -58,8 +58,6 @@ public:
 
   void Reset() { initialized_ = false; }
 
-  float GetLastErr() { return last_error_; }
-
 private:
   float kp_; // * (P)roportional Tuning Parameter
   float ki_; // * (I)ntegral Tuning Parameter
