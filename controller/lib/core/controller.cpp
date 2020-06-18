@@ -24,10 +24,10 @@ static constexpr Duration LOOP_PERIOD = milliseconds(10);
 // Inputs - set from external debug program, read but never modified here.
 static DebugFloat dbg_blower_valve_kp("blower_valve_kp",
                                       "Proportional gain for blower valve PID",
-                                      0.7f);
+                                      0.05f);
 static DebugFloat dbg_blower_valve_ki("blower_valve_ki",
                                       "Integral gain for blower valve PID",
-                                      1.0f);
+                                      6.0f);
 static DebugFloat dbg_blower_valve_kd("blower_valve_kd",
                                       "Derivative gain for blower valve PID");
 
@@ -46,6 +46,13 @@ static DebugFloat dbg_volume_uncorrected("uncorrected_volume",
                                          "Patient volume w/o correction, ml");
 static DebugFloat dbg_flow_correction("flow_correction",
                                       "Correction to flow, cc/sec");
+									  
+static DebugFloat blower_power( "blower_power", "blower power during gui_mode 0", 0.0f);
+static DebugFloat inh_valve_pos( "inh_valve_pos", "inhale valve position during gui_mode 0", 0.0f);
+static DebugFloat exh_valve_pos( "exh_valve_pos", "exhale valve position during gui_mode 0", 1.0f);
+static DebugFloat exhale_valve_on_pip( "exhale_valve_on_pip", "inhale valve position during gui_mode 0", 0.0f);
+static DebugFloat exhale_valve_on_peep( "exhale_valve_on_peep", "inhale valve position during gui_mode 0", 0.0f);
+ 									  
 
 Controller::Controller()
     : blower_valve_pid_(dbg_blower_valve_kp.Get(), dbg_blower_valve_ki.Get(),
@@ -93,9 +100,9 @@ Controller::Run(Time now, const VentParams &params,
 
     actuators_state = {
         .fio2_valve = 0,
-        .blower_power = 0,
-        .blower_valve = 0,
-        .exhale_valve = 1,
+        .blower_power = blower_power.Get(),
+        .blower_valve = inh_valve_pos.Get(),
+        .exhale_valve = exh_valve_pos.Get(),
     };
     ventilator_was_on_ = false;
   } else {
@@ -105,16 +112,17 @@ Controller::Run(Time now, const VentParams &params,
       uncorrected_flow_integrator_.emplace();
     }
     // Start controlling pressure.
+	float blower_valve = blower_valve_pid_.Compute(
+            now, sensor_readings.patient_pressure.kPa(),
+            desired_state.pressure_setpoint->kPa());
     actuators_state = {
         .fio2_valve = 0, // not used yet
         // In normal mode, blower is always full power; pid controls pressure by
         // actuating the blower pinch valve.
         .blower_power = 1,
-        .blower_valve = blower_valve_pid_.Compute(
-            now, sensor_readings.patient_pressure.kPa(),
-            desired_state.pressure_setpoint->kPa()),
-        .exhale_valve =
-            desired_state.flow_direction == FlowDirection::EXPIRATORY ? 1 : 0,
+        .blower_valve = blower_valve,
+        .exhale_valve = (1.0f-0.8f*blower_valve-0.2f)
+            //desired_state.flow_direction == FlowDirection::EXPIRATORY ? exhale_valve_on_peep.Get() : exhale_valve_on_pip.Get(),
     };
     ventilator_was_on_ = true;
   }
