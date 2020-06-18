@@ -111,6 +111,8 @@ Controller::Run(Time now, const VentParams &params,
       flow_integrator_.emplace();
       uncorrected_flow_integrator_.emplace();
     }
+	dbg_blower_valve_ki.Set(std::clamp(2.0f*(static_cast<float>(params.pip_cm_h2o)-static_cast<float>(params.peep_cm_h2o))-10.0f, 10.0f, 20.0f));
+	
     // Start controlling pressure.
 	float blower_valve = blower_valve_pid_.Compute(
             now, sensor_readings.patient_pressure.kPa(),
