@@ -13,6 +13,7 @@
 #include <QFontInfo>
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
+#include <QSound>
 #include <QtCore/QDir>
 #include <QtQml/QQmlContext>
 #include <QtQml/QQmlEngine>
@@ -176,5 +177,7 @@ int main(int argc, char *argv[]) {
     return EXIT_SUCCESS;
   }
 
+  QSound sound("qrc:/sounds/high.wav");
+  sound.play();
   return app.exec();
 }
