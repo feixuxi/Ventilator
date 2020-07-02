@@ -22,7 +22,7 @@ limitations under the License.
 #include <optional>
 #include <stdint.h>
 
-#define TRACE_VAR_CT 4
+#define TRACE_VAR_CT 7
 
 /*
  * Implements a data trace facility.

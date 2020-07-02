@@ -56,6 +56,12 @@ static DebugFloat dbg_forced_psol_pos(
     "scales this further; see psol_pwm_closed and psol_pwm_open.)  Specify a "
     "value outside this range to let the controller control the psol.",
     -1.f);
+	
+//Control values for Modelica validation
+static DebugFloat dbg_cmd_inh_valve("cmd_inh_valve", "Inhale valve commanded position", -1.0f);
+static DebugFloat dbg_cmd_exh_valve("cmd_exh_valve", "Exhale valve commanded position", -1.0f);
+static DebugFloat dbg_cmd_psol("cmd_psol", "PSOL commanded position", -1.0f);
+static DebugFloat dbg_pressure("pressure", "Patient pressure, cmH2O");
 
 // Unchanging outputs - read from external debug program, never modified here.
 static DebugUInt32 dbg_per("loop_period", "Loop period, read-only (usec)",
@@ -177,11 +183,29 @@ Controller::Run(Time now, const VentParams &params,
       psol_pid_.Reset();
 
       // Calculate blower valve command using calculated gains
-      float blower_valve =
+      dbg_pressure.Set(sensor_readings.patient_pressure.kPa());
+	  float blower_valve =
+          blower_valve_pid_.Compute(now, dbg_pressure.Get(),
+                                    desired_state.pressure_setpoint->kPa());
+	  
+	  /*float blower_valve =
           blower_valve_pid_.Compute(now, sensor_readings.patient_pressure.kPa(),
                                     desired_state.pressure_setpoint->kPa());
+									*/
+	  dbg_cmd_inh_valve.Set(std::clamp(blower_valve + 0.05f, 0.0f, 1.0f));
+	  dbg_cmd_exh_valve.Set(1.0f - 0.55f * blower_valve - 0.4f);
+	  dbg_cmd_psol.Set(0);
+	  actuators_state = {
+          .fio2_valve = dbg_cmd_psol.Get(),
+          // In normal mode, blower is always full power; pid controls pressure
+          // by actuating the blower pinch valve.
+          .blower_power = 1,
+          .blower_valve = dbg_cmd_inh_valve.Get(),
+          // coupled control: exhale valve tracks inhale valve command
+          .exhale_valve = dbg_cmd_exh_valve.Get(),
+      };
 
-      actuators_state = {
+      /*actuators_state = {
           .fio2_valve = 0,
           // In normal mode, blower is always full power; pid controls pressure
           // by actuating the blower pinch valve.
@@ -190,14 +214,34 @@ Controller::Run(Time now, const VentParams &params,
           // coupled control: exhale valve tracks inhale valve command
           .exhale_valve = 1.0f - 0.55f * blower_valve - 0.4f,
       };
+	  */
+	  
     } else {
       // Delivering pure oxygen.
       blower_valve_pid_.Reset();
 
-      float psol_valve =
+	  dbg_pressure.Set(sensor_readings.patient_pressure.kPa());
+	  float psol_valve =
+          psol_pid_.Compute(now, dbg_pressure.Get(),
+                            desired_state.pressure_setpoint->kPa());
+      /*float psol_valve =
           psol_pid_.Compute(now, sensor_readings.patient_pressure.kPa(),
                             desired_state.pressure_setpoint->kPa());
-      actuators_state = {
+							*/
+	  dbg_cmd_inh_valve.Set(0);
+	  dbg_cmd_exh_valve.Set(1.0f - 0.6f * psol_valve - 0.4f);
+	  dbg_cmd_psol.Set(std::clamp(psol_valve + 0.05f, 0.0f, 1.0f));						
+	  actuators_state = {
+          // Force psol to stay very slightly open to avoid the discontinuity
+          // caused by valve hysteresis at very low command.  The exhale valve
+          // compensates for this intentional leakage by staying open when the
+          // psol valve is closed.
+          .fio2_valve = dbg_cmd_psol.Get(),
+          .blower_power = 0,
+          .blower_valve = dbg_cmd_inh_valve.Get(),
+          .exhale_valve = dbg_cmd_exh_valve.Get(),
+      };
+      /*actuators_state = {
           // Force psol to stay very slightly open to avoid the discontinuity
           // caused by valve hysteresis at very low command.  The exhale valve
           // compensates for this intentional leakage by staying open when the
@@ -207,6 +251,7 @@ Controller::Run(Time now, const VentParams &params,
           .blower_valve = 0,
           .exhale_valve = 1.0f - 0.6f * psol_valve - 0.4f,
       };
+	  */
     }
 
     // Start controlling pressure.

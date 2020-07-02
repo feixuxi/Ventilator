@@ -51,6 +51,19 @@ static FnDebugVar vartrace_var4(
     VarType::INT32, "trace_var4", "Variable to be saved to the trace buffer",
     "%d", [] { return trace.GetTracedVarId<3>(); },
     [](int32_t value) { trace.SetTracedVarId<3>(value); });
+static FnDebugVar vartrace_var5(
+    VarType::INT32, "trace_var5", "Variable to be saved to the trace buffer",
+    "%d", [] { return trace.GetTracedVarId<4>(); },
+    [](int32_t value) { trace.SetTracedVarId<4>(value); });
+static FnDebugVar vartrace_var6(
+    VarType::INT32, "trace_var6", "Variable to be saved to the trace buffer",
+    "%d", [] { return trace.GetTracedVarId<5>(); },
+    [](int32_t value) { trace.SetTracedVarId<5>(value); });
+static FnDebugVar vartrace_var7(
+    VarType::INT32, "trace_var7", "Variable to be saved to the trace buffer",
+    "%d", [] { return trace.GetTracedVarId<6>(); },
+    [](int32_t value) { trace.SetTracedVarId<6>(value); });
+	
 
 DbgErrCode TraceCmd::HandleCmd(CmdContext *context) {
 

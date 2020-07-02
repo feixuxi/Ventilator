@@ -61,7 +61,7 @@ VAR_FLOAT = 3
 
 # Can trace this many variables at once.  Keep this in sync with TRACE_VAR_CT
 # in the controller.
-TRACE_VAR_CT = 4
+TRACE_VAR_CT = 7
 
 # If true, the raw bytes of the serial data will be printed.
 # This is handy for debugging the low level serial interface

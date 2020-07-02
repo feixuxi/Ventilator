@@ -25,7 +25,7 @@ Arduino Nano and the MPXV5004GP and MPXV7002DP pressure sensors.
 
 static DebugFloat dbg_dp_inhale("dp_inhale", "Inhale diff pressure, cmH2O");
 static DebugFloat dbg_dp_exhale("dp_exhale", "Exhale diff pressure, cmH2O");
-static DebugFloat dbg_pressure("pressure", "Patient pressure, cmH2O");
+//static DebugFloat dbg_pressure("pressure", "Patient pressure, cmH2O"); moved to controller.
 static DebugFloat dbg_flow_inhale("flow_inhale", "Inhale flow rate, cc/sec");
 static DebugFloat dbg_flow_exhale("flow_exhale", "Exhale flow rate, cc/sec");
 // Flow correction happens as part of volume computation, in the Controller.
@@ -141,7 +141,7 @@ SensorReadings Sensors::GetReadings() {
   // Set debug variables.
   dbg_dp_inhale.Set(inflow_delta.cmH2O());
   dbg_dp_exhale.Set(outflow_delta.cmH2O());
-  dbg_pressure.Set(patient_pressure.cmH2O());
+  //dbg_pressure.Set(patient_pressure.cmH2O()); moved to controller.cpp so that recorded data is the same as inputs to controller.
   dbg_flow_inhale.Set(inflow.ml_per_sec());
   dbg_flow_exhale.Set(outflow.ml_per_sec());
   dbg_flow_uncorrected.Set(uncorrected_flow.ml_per_sec());
