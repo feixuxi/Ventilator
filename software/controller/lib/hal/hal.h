@@ -87,6 +87,7 @@ enum class AnalogPin {
   PATIENT_PRESSURE,
   INFLOW_PRESSURE_DIFF,
   OUTFLOW_PRESSURE_DIFF,
+  FIO2,
 };
 
 // Pulse-width modulated outputs from the controller.  These can be set to

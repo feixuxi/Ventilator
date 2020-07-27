@@ -41,6 +41,7 @@ struct SensorReadings {
   // sensor zero-point drift.
   VolumetricFlow inflow;
   VolumetricFlow outflow;
+  float fio2;
 };
 
 // Provides calibrated sensor readings, including tidal volume (TV)
@@ -81,12 +82,14 @@ private:
     PATIENT_PRESSURE,
     INFLOW_PRESSURE_DIFF,
     OUTFLOW_PRESSURE_DIFF,
+	FIO2,
   };
   // Keep this in sync with the Sensor enum!
-  inline constexpr static int NUM_SENSORS = 3;
+  inline constexpr static int NUM_SENSORS = 4;
 
   static AnalogPin PinFor(Sensor s);
   Pressure ReadPressureSensor(Sensor s);
+  float ReadOxygenSensor(Sensor s);
 
   // Calibrated average sensor values in a zero state.
   Voltage sensors_zero_vals_[NUM_SENSORS];

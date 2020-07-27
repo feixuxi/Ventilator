@@ -28,6 +28,8 @@ static DebugFloat dbg_dp_exhale("dp_exhale", "Exhale diff pressure, cmH2O");
 static DebugFloat dbg_pressure("pressure", "Patient pressure, cmH2O");
 static DebugFloat dbg_flow_inhale("flow_inhale", "Inhale flow rate, cc/sec");
 static DebugFloat dbg_flow_exhale("flow_exhale", "Exhale flow rate, cc/sec");
+static DebugFloat dbg_fio2("fio2", "FIO2, [0-100%]");
+static DebugFloat dbg_fio2volts("fio2volts", "FIO2 reading in raw volts");
 // Flow correction happens as part of volume computation, in the Controller.
 static DebugFloat dbg_flow_uncorrected("flow_uncorrected",
                                        "Uncorrected net flow rate, cc/sec");
@@ -60,6 +62,8 @@ static_assert(VENTURI_CHOKE_DIAM > meters(0));
     return AnalogPin::INFLOW_PRESSURE_DIFF;
   case OUTFLOW_PRESSURE_DIFF:
     return AnalogPin::OUTFLOW_PRESSURE_DIFF;
+  case FIO2:
+    return AnalogPin::FIO2;
   }
   // Switch above covers all cases.
   __builtin_unreachable();
@@ -89,7 +93,7 @@ void Sensors::Calibrate() {
   Hal.delay(milliseconds(20));
 
   for (Sensor s :
-       {PATIENT_PRESSURE, INFLOW_PRESSURE_DIFF, OUTFLOW_PRESSURE_DIFF}) {
+       {PATIENT_PRESSURE, INFLOW_PRESSURE_DIFF, OUTFLOW_PRESSURE_DIFF, FIO2}) {
     sensors_zero_vals_[s] = Hal.analogRead(PinFor(s));
   }
 }
@@ -108,6 +112,23 @@ Pressure Sensors::ReadPressureSensor(Sensor s) {
   static const float TRANSFER_FN_COEFF = 5.f / 3.3f;
   return kPa(TRANSFER_FN_COEFF *
              (Hal.analogRead(PinFor(s)) - sensors_zero_vals_[s]).volts());
+}
+
+float Sensors::ReadOxygenSensor(Sensor s) {
+  // Teledyne R24-compatible Electrochemical Cell Oxygen Sensoe
+  // Sensitivity of 0.06V/fio2, where fio2 is 0.0 to 1.0, at atmospheric
+  //   pressure
+  // PCB has an op-amp to gain the output up by 50V/V
+  // This gives about 3.0V full scale.
+  // Output scales with partial pressure of O2, so atmostpheric pressure must
+  //   be compensated to get an accurate FIO2.
+  //
+  // Ambient pressure sensor not supported in Rev 1.0, so set this as a constant
+  static const float P_AMBIENT = 101.3f;
+  static const float G_AMP = 50.0f;
+  static const float G_OXYGEN_SENSOR = 0.06f;
+  
+  return std::clamp( (Hal.analogRead(PinFor(s)) - sensors_zero_vals_[FIO2]).volts() * (101.3f/P_AMBIENT/G_AMP/G_OXYGEN_SENSOR) + 0.21f, 0.0f, 1.0f);
 }
 
 /*static*/ VolumetricFlow Sensors::PressureDeltaToFlow(Pressure delta) {
@@ -133,6 +154,7 @@ SensorReadings Sensors::GetReadings() {
   auto patient_pressure = ReadPressureSensor(PATIENT_PRESSURE);
   auto inflow_delta = ReadPressureSensor(INFLOW_PRESSURE_DIFF);
   auto outflow_delta = ReadPressureSensor(OUTFLOW_PRESSURE_DIFF);
+  auto fio2 = ReadOxygenSensor(FIO2);
 
   VolumetricFlow inflow = PressureDeltaToFlow(inflow_delta);
   VolumetricFlow outflow = PressureDeltaToFlow(outflow_delta);
@@ -145,6 +167,8 @@ SensorReadings Sensors::GetReadings() {
   dbg_flow_inhale.Set(inflow.ml_per_sec());
   dbg_flow_exhale.Set(outflow.ml_per_sec());
   dbg_flow_uncorrected.Set(uncorrected_flow.ml_per_sec());
+  dbg_fio2.Set(fio2);
+  dbg_fio2volts.Set(Hal.analogRead(PinFor(FIO2)).volts());
 
   return {
       .patient_pressure = patient_pressure,
@@ -152,5 +176,6 @@ SensorReadings Sensors::GetReadings() {
       .outflow_pressure_diff = outflow_delta,
       .inflow = inflow,
       .outflow = outflow,
+	  .fio2 = fio2,
   };
 }
