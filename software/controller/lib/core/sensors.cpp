@@ -28,7 +28,7 @@ static DebugFloat dbg_dp_exhale("dp_exhale", "Exhale diff pressure, cmH2O");
 static DebugFloat dbg_pressure("pressure", "Patient pressure, cmH2O");
 static DebugFloat dbg_flow_inhale("flow_inhale", "Inhale flow rate, cc/sec");
 static DebugFloat dbg_flow_exhale("flow_exhale", "Exhale flow rate, cc/sec");
-static DebugFloat dbg_fio2("fio2", "FIO2, [0-100%]");
+static DebugFloat dbg_fio2("fio2", "FIO2, [0-1.0]");
 static DebugFloat dbg_fio2volts("fio2volts", "FIO2 reading in raw volts");
 // Flow correction happens as part of volume computation, in the Controller.
 static DebugFloat dbg_flow_uncorrected("flow_uncorrected",
