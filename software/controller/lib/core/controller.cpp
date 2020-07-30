@@ -37,8 +37,8 @@ static DebugFloat dbg_psol_kd("psol_kd", "Derivative gain for O2 psol PID", 0);
 
 static DebugFloat dbg_fio2_kp("fio2_kp", "Proportional gain for O2 psol PID",
                               0.001f);
-static DebugFloat dbg_fio2_ki("fio2l_ki", "Integral gain for O2 psol PID",
-                              0.01f);
+static DebugFloat dbg_fio2_ki("fio2_ki", "Integral gain for O2 psol PID",
+                              0.1f);
 static DebugFloat dbg_fio2_kd("fio2_kd", "Derivative gain for O2 psol PID", 0);
 
 static DebugFloat dbg_forced_blower_power(
@@ -153,6 +153,9 @@ Controller::Run(Time now, const VentParams &params,
   psol_pid_.SetKP(dbg_psol_kp.Get());
   psol_pid_.SetKI(dbg_psol_ki.Get());
   psol_pid_.SetKD(dbg_psol_kd.Get());
+  fio2_pid_.SetKP(dbg_fio2_kp.Get());
+  fio2_pid_.SetKI(dbg_fio2_ki.Get());
+  fio2_pid_.SetKD(dbg_fio2_kd.Get());
 
   ActuatorsState actuators_state;
   if (desired_state.pressure_setpoint == std::nullopt) {
@@ -165,6 +168,7 @@ Controller::Run(Time now, const VentParams &params,
     // them to the desired positions.
     blower_valve_pid_.Reset();
     psol_pid_.Reset();
+	fio2_pid_.Reset();
 
     actuators_state = {
         .fio2_valve = 0,
