@@ -122,6 +122,8 @@ float Sensors::ReadOxygenSensor(Sensor s) {
   // This gives about 3.0V full scale.
   // Output scales with partial pressure of O2, so atmostpheric pressure must
   //   be compensated to get an accurate FIO2.
+  // Returns Oxygen concentration as a float with value 0.0 to 1.0.
+  // 0.21 is atmosphere, 1.0 is 100% oxygen
   //
   // Ambient pressure sensor not supported in Rev 1.0, so set this as a constant
   static const float P_AMBIENT = 101.3f;

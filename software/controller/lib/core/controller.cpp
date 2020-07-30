@@ -35,6 +35,12 @@ static DebugFloat dbg_psol_ki("psol_ki", "Integral gain for O2 psol PID",
                               20.0f);
 static DebugFloat dbg_psol_kd("psol_kd", "Derivative gain for O2 psol PID", 0);
 
+static DebugFloat dbg_fio2_kp("fio2_kp", "Proportional gain for O2 psol PID",
+                              0.001f);
+static DebugFloat dbg_fio2_ki("fio2l_ki", "Integral gain for O2 psol PID",
+                              0.01f);
+static DebugFloat dbg_fio2_kd("fio2_kd", "Derivative gain for O2 psol PID", 0);
+
 static DebugFloat dbg_forced_blower_power(
     "forced_blower_power",
     "Force the blower fan to a particular power [0,1].  Specify a value "
@@ -95,7 +101,11 @@ Controller::Controller()
                         /*output_max=*/1.0f),
       psol_pid_(dbg_psol_kp.Get(), dbg_psol_ki.Get(), dbg_psol_kd.Get(),
                 ProportionalTerm::ON_ERROR, DifferentialTerm::ON_MEASUREMENT,
+                /*output_min=*/0.f, /*output_max=*/1.f),
+      fio2_pid_(dbg_fio2_kp.Get(), dbg_fio2_ki.Get(), dbg_fio2_kd.Get(),
+                ProportionalTerm::ON_ERROR, DifferentialTerm::ON_MEASUREMENT,
                 /*output_min=*/0.f, /*output_max=*/1.f) {}
+				
 
 /*static*/ Duration Controller::GetLoopPeriod() { return LOOP_PERIOD; }
 
@@ -180,9 +190,11 @@ Controller::Run(Time now, const VentParams &params,
       float blower_valve =
           blower_valve_pid_.Compute(now, sensor_readings.patient_pressure.kPa(),
                                     desired_state.pressure_setpoint->kPa());
+	  float fio2_coupling_value = fio2_pid_.Compute(now, sensor_readings.fio2,
+                                    params.fio2);							
 
       actuators_state = {
-          .fio2_valve = 0,
+          .fio2_valve = blower_valve * fio2_coupling_value,
           // In normal mode, blower is always full power; pid controls pressure
           // by actuating the blower pinch valve.
           .blower_power = 1,
