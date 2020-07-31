@@ -41,6 +41,8 @@ static DebugFloat dbg_fio2_ki("fio2_ki", "Integral gain for O2 psol PID",
                               0.1f);
 static DebugFloat dbg_fio2_kd("fio2_kd", "Derivative gain for O2 psol PID", 0);
 
+static DebugFloat dbg_fio2_setpoint("fio2_setpoint", "FiO2 setpoint [0.0, 1.0]");
+
 static DebugFloat dbg_forced_blower_power(
     "forced_blower_power",
     "Force the blower fan to a particular power [0,1].  Specify a value "
@@ -156,6 +158,7 @@ Controller::Run(Time now, const VentParams &params,
   fio2_pid_.SetKP(dbg_fio2_kp.Get());
   fio2_pid_.SetKI(dbg_fio2_ki.Get());
   fio2_pid_.SetKD(dbg_fio2_kd.Get());
+  dbg_fio2_setpoint.Set(params.fio2);
 
   ActuatorsState actuators_state;
   if (desired_state.pressure_setpoint == std::nullopt) {
