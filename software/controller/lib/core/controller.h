@@ -53,6 +53,7 @@ private:
   PID blower_valve_pid_;
   PID psol_pid_;
   PID fio2_pid_;
+  PID air_flow_pid_;
 
   // These objects accumulate flow to calculate volume.
   //
