@@ -138,8 +138,9 @@ jobs:
       - run:
           name: Run tests
           command: |
-            ci_env=`bash <(curl -s https://codecov.io/env)`
-            docker run $ci_env -i respiraworks/gui:$CIRCLE_SHA1 software/gui/gui.sh --test
+            ci_env=`/bin/bash <(curl -s https://codecov.io/env)`
+            docker run $ci_env --name gui-tests respiraworks/gui:$CIRCLE_SHA1 software/gui/gui.sh --test
+            docker container exec gui-tests bash <(curl -s https://codecov.io/bash)
       - run:
           name: Push docker image
           command: |
