@@ -139,8 +139,9 @@ jobs:
           name: Run tests
           command: |
             ci_env=`/bin/bash <(curl -s https://codecov.io/env)`
-            docker run -t $ci_env --name gui-tests respiraworks/gui:$CIRCLE_SHA1 software/gui/gui.sh --test
-            cd software && bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"
+            docker run -d $ci_env --name gui-tests respiraworks/gui:$CIRCLE_SHA1 software/gui/gui.sh --test
+            docker exec gui-tests cd software && bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"
+            docker stop gui-tests
       - run:
           name: Push docker image
           command: |
