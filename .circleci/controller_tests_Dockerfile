@@ -14,7 +14,6 @@ COPY . ./
 CMD /bin/bash software/gui/gui.sh --install
 CMD /bin/bash software/gui/gui.sh --build
 CMD /bin/bash software/gui/gui.sh --test
-CMD /bin/bash mkdir coveragefiles
 CMD /bin/bash cp software/gui/build/tests/*.gcno .
 CMD /bin/bash cp software/gui/build/tests/*.gcda .
 CMD /bin/bash /bin/bash <(curl -s https://codecov.io/bash) || echo 'Codecov did not collect coverage reports'
