@@ -25,9 +25,6 @@ static constexpr Duration LOOP_PERIOD = milliseconds(10);
 static DebugFloat dbg_blower_valve_kp("blower_valve_kp",
                                       "Proportional gain for blower valve PID",
                                       0.04f);
-static DebugFloat dbg_blower_valve_ki("blower_valve_ki",
-                                      "Integreal gain for blower valve PID");
-
 static DebugFloat dbg_blower_valve_kd("blower_valve_kd",
                                       "Derivative gain for blower valve PID");
 
@@ -164,13 +161,13 @@ Controller::Run(Time now, const VentParams &params,
   // Note that we use desired_state.pip/peep and not params.pip/peep because
   // desired_state updates at breath boundaries, whereas params updates
   // whenever the user clicks the touchscreen.
-  /*float blower_ki = std::clamp(
-      (desired_state.pip - desired_state.peep).cmH2O() - 5.0f, 10.0f, 20.0f);*/
+  float blower_ki = std::clamp(
+      (desired_state.pip - desired_state.peep).cmH2O() - 5.0f, 10.0f, 20.0f);
 
-  // dbg_blower_valve_computed_ki.Set(blower_ki);
+  dbg_blower_valve_computed_ki.Set(blower_ki);
 
   blower_valve_pid_.SetKP(dbg_blower_valve_kp.Get());
-  blower_valve_pid_.SetKI(dbg_blower_valve_ki.Get());
+  blower_valve_pid_.SetKI(blower_ki);
   blower_valve_pid_.SetKD(dbg_blower_valve_kd.Get());
   psol_pid_.SetKP(dbg_psol_kp.Get());
   psol_pid_.SetKI(dbg_psol_ki.Get());
@@ -219,16 +216,9 @@ Controller::Run(Time now, const VentParams &params,
       psol_pid_.Reset();
 
       // Calculate blower valve command using calculated gains
-      /*float blower_valve =
-          blower_valve_pid_.Compute(now, sensor_readings.patient_pressure.kPa(),
-                                    desired_state.pressure_setpoint->kPa());*/
-
-      float flow_cmd =
+      float blower_valve =
           blower_valve_pid_.Compute(now, sensor_readings.patient_pressure.kPa(),
                                     desired_state.pressure_setpoint->kPa());
-      float blower_valve = air_flow_pid_.Compute(
-          now, sensor_readings.inflow.liters_per_sec(), flow_cmd);
-
       float fio2_coupling_value =
           std::clamp(params.fio2 + fio2_pid_.Compute(now, sensor_readings.fio2,
                                                      params.fio2),
