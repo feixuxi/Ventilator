@@ -25,6 +25,9 @@ static constexpr Duration LOOP_PERIOD = milliseconds(10);
 static DebugFloat dbg_blower_valve_kp("blower_valve_kp",
                                       "Proportional gain for blower valve PID",
                                       0.04f);
+static DebugFloat dbg_blower_valve_ki("blower_valve_ki",
+                                      "Integreal gain for blower valve PID");
+
 static DebugFloat dbg_blower_valve_kd("blower_valve_kd",
                                       "Derivative gain for blower valve PID");
 
@@ -37,22 +40,25 @@ static DebugFloat dbg_psol_kd("psol_kd", "Derivative gain for O2 psol PID", 0);
 
 static DebugFloat dbg_fio2_kp("fio2_kp", "Proportional gain for O2 psol PID",
                               4.0f);
-static DebugFloat dbg_fio2_ki("fio2_ki", "Integral gain for O2 psol PID",
-                              1.0f);
+static DebugFloat dbg_fio2_ki("fio2_ki", "Integral gain for O2 psol PID", 1.0f);
 static DebugFloat dbg_fio2_kd("fio2_kd", "Derivative gain for O2 psol PID", 0);
 
-static DebugFloat dbg_air_flow_kp("air_flow_kp", "Proportional gain for AIR Flow PID",
-                              0.1f);
-static DebugFloat dbg_air_flow_ki("air_flow_ki", "Integral gain for AIR Flow PID",
-                              20.0f);
-static DebugFloat dbg_air_flow_kd("air_flow_kd", "Derivative gain for AIR Flow PID", 0);
+static DebugFloat dbg_air_flow_kp("air_flow_kp",
+                                  "Proportional gain for AIR Flow PID", 0.1f);
+static DebugFloat dbg_air_flow_ki("air_flow_ki",
+                                  "Integral gain for AIR Flow PID", 20.0f);
+static DebugFloat dbg_air_flow_kd("air_flow_kd",
+                                  "Derivative gain for AIR Flow PID", 0);
 
-static DebugFloat dbg_fio2_setpoint("fio2_setpoint", "FiO2 setpoint [0.0, 1.0]");
+static DebugFloat dbg_fio2_setpoint("fio2_setpoint",
+                                    "FiO2 setpoint [0.0, 1.0]");
 
-//experimental: debug for flow controller testing
-static DebugFloat dbg_air_flow_setpoint("air_flow_setpoint", "Setpoint for Air Flow Controller", 0);
+// experimental: debug for flow controller testing
+static DebugFloat dbg_air_flow_setpoint("air_flow_setpoint",
+                                        "Setpoint for Air Flow Controller", 0);
 
-static DebugFloat dbg_air_flow_lps("air_flow_lps", "Measured Air Flow in liters per sec", 0);
+static DebugFloat dbg_air_flow_lps("air_flow_lps",
+                                   "Measured Air Flow in liters per sec", 0);
 
 static DebugFloat dbg_forced_blower_power(
     "forced_blower_power",
@@ -118,10 +124,10 @@ Controller::Controller()
       fio2_pid_(dbg_fio2_kp.Get(), dbg_fio2_ki.Get(), dbg_fio2_kd.Get(),
                 ProportionalTerm::ON_ERROR, DifferentialTerm::ON_MEASUREMENT,
                 /*output_min=*/-1.0f, /*output_max=*/1.f),
-      air_flow_pid_(dbg_air_flow_kp.Get(), dbg_air_flow_ki.Get(), dbg_air_flow_kd.Get(),
-                ProportionalTerm::ON_ERROR, DifferentialTerm::ON_MEASUREMENT,
-                /*output_min=*/0.0f, /*output_max=*/1.f) {}
-				
+      air_flow_pid_(dbg_air_flow_kp.Get(), dbg_air_flow_ki.Get(),
+                    dbg_air_flow_kd.Get(), ProportionalTerm::ON_ERROR,
+                    DifferentialTerm::ON_MEASUREMENT,
+                    /*output_min=*/0.0f, /*output_max=*/1.f) {}
 
 /*static*/ Duration Controller::GetLoopPeriod() { return LOOP_PERIOD; }
 
@@ -158,13 +164,13 @@ Controller::Run(Time now, const VentParams &params,
   // Note that we use desired_state.pip/peep and not params.pip/peep because
   // desired_state updates at breath boundaries, whereas params updates
   // whenever the user clicks the touchscreen.
-  float blower_ki = std::clamp(
-      (desired_state.pip - desired_state.peep).cmH2O() - 5.0f, 10.0f, 20.0f);
+  /*float blower_ki = std::clamp(
+      (desired_state.pip - desired_state.peep).cmH2O() - 5.0f, 10.0f, 20.0f);*/
 
-  dbg_blower_valve_computed_ki.Set(blower_ki);
+  // dbg_blower_valve_computed_ki.Set(blower_ki);
 
   blower_valve_pid_.SetKP(dbg_blower_valve_kp.Get());
-  blower_valve_pid_.SetKI(blower_ki);
+  blower_valve_pid_.SetKI(dbg_blower_valve_ki.Get());
   blower_valve_pid_.SetKD(dbg_blower_valve_kd.Get());
   psol_pid_.SetKP(dbg_psol_kp.Get());
   psol_pid_.SetKI(dbg_psol_ki.Get());
@@ -189,8 +195,8 @@ Controller::Run(Time now, const VentParams &params,
     // them to the desired positions.
     blower_valve_pid_.Reset();
     psol_pid_.Reset();
-	fio2_pid_.Reset();
-	air_flow_pid_.Reset();
+    fio2_pid_.Reset();
+    air_flow_pid_.Reset();
 
     actuators_state = {
         .fio2_valve = 0,
@@ -213,14 +219,25 @@ Controller::Run(Time now, const VentParams &params,
       psol_pid_.Reset();
 
       // Calculate blower valve command using calculated gains
-      float blower_valve =
+      /*float blower_valve =
+          blower_valve_pid_.Compute(now, sensor_readings.patient_pressure.kPa(),
+                                    desired_state.pressure_setpoint->kPa());*/
+
+      float flow_cmd =
           blower_valve_pid_.Compute(now, sensor_readings.patient_pressure.kPa(),
                                     desired_state.pressure_setpoint->kPa());
-	  float fio2_coupling_value = std::clamp(params.fio2 + fio2_pid_.Compute(now, sensor_readings.fio2,
-                                    params.fio2), 0.0f, 1.0f);	   //just a little bit of feed-forward					
+      float blower_valve = air_flow_pid_.Compute(
+          now, sensor_readings.inflow.liters_per_sec(), flow_cmd);
+
+      float fio2_coupling_value =
+          std::clamp(params.fio2 + fio2_pid_.Compute(now, sensor_readings.fio2,
+                                                     params.fio2),
+                     0.0f, 1.0f); // just a little bit of feed-forward
 
       actuators_state = {
-          .fio2_valve = std::clamp(sensor_readings.inflow.liters_per_sec() * fio2_coupling_value, 0.0f, 1.0f),
+          .fio2_valve = std::clamp(sensor_readings.inflow.liters_per_sec() *
+                                       fio2_coupling_value,
+                                   0.0f, 1.0f),
           // In normal mode, blower is always full power; pid controls pressure
           // by actuating the blower pinch valve.
           .blower_power = 1,
@@ -231,39 +248,41 @@ Controller::Run(Time now, const VentParams &params,
     } else {
       // Delivering air + oxygen mixes from 60 to 100%
       blower_valve_pid_.Reset();
-	  
-	  //experimental shit
-	  /*
-	  float blower_valve = 
-		  air_flow_pid_.Compute(now, sensor_readings.inflow.liters_per_sec(),
-                            dbg_air_flow_setpoint.Get());
-      */							
-							
-	  float psol_valve =
+
+      // experimental shit
+      /*
+      float blower_valve =
+              air_flow_pid_.Compute(now,
+      sensor_readings.inflow.liters_per_sec(), dbg_air_flow_setpoint.Get());
+  */
+
+      float psol_valve =
           psol_pid_.Compute(now, sensor_readings.patient_pressure.kPa(),
                             desired_state.pressure_setpoint->kPa());
-	
-	  float fio2_coupling_value = std::clamp(params.fio2 + fio2_pid_.Compute(now, sensor_readings.fio2,
-                                    params.fio2), 0.0f, 1.0f);	   //just a little bit of feed-forward
-									
-	  float blower_valve = 
-		  air_flow_pid_.Compute(now, sensor_readings.inflow.liters_per_sec(),
-                            psol_valve * (1-fio2_coupling_value));
-							
-		//experimental shit
-		/*
-		actuators_state = {
-          // Force psol to stay very slightly open to avoid the discontinuity
-          // caused by valve hysteresis at very low command.  The exhale valve
-          // compensates for this intentional leakage by staying open when the
-          // psol valve is closed.
-          .fio2_valve = 0,
-          .blower_power = 1,
-          .blower_valve = blower_valve,
-          .exhale_valve = 1.0f, // - 0.6f * psol_valve - 0.4f,
-		  };
-		  */
-		  
+
+      float fio2_coupling_value =
+          std::clamp(params.fio2 + fio2_pid_.Compute(now, sensor_readings.fio2,
+                                                     params.fio2),
+                     0.0f, 1.0f); // just a little bit of feed-forward
+
+      float blower_valve =
+          air_flow_pid_.Compute(now, sensor_readings.inflow.liters_per_sec(),
+                                psol_valve * (1 - fio2_coupling_value));
+
+      // experimental shit
+      /*
+      actuators_state = {
+// Force psol to stay very slightly open to avoid the discontinuity
+// caused by valve hysteresis at very low command.  The exhale valve
+// compensates for this intentional leakage by staying open when the
+// psol valve is closed.
+.fio2_valve = 0,
+.blower_power = 1,
+.blower_valve = blower_valve,
+.exhale_valve = 1.0f, // - 0.6f * psol_valve - 0.4f,
+        };
+        */
+
       actuators_state = {
           // Force psol to stay very slightly open to avoid the discontinuity
           // caused by valve hysteresis at very low command.  The exhale valve
@@ -273,9 +292,7 @@ Controller::Run(Time now, const VentParams &params,
           .blower_power = 1.0f,
           .blower_valve = std::clamp(blower_valve, 0.0f, 1.0f),
           .exhale_valve = 1.0f - 0.6f * psol_valve - 0.4f,
-		  };
-		  
-      
+      };
     }
 
     // Start controlling pressure.
