@@ -162,12 +162,12 @@ workflows:
     jobs:
       - dead-link-test
       - common-precommit-checks
+      - common-static-analysis
       - controller-tests
       - gui-tests
-      - gui-static-analysis
       - gui-build-image:
           requires:
             - common-precommit-checks
-            - gui-static-analysis
+            - common-static-analysis
             - gui-tests
             - controller-tests
