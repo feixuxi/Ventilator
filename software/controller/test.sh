@@ -38,6 +38,7 @@ INTEGRATION_TEST_H=psol_test.h pio run -e integration-test
 
 # Make sure controller builds for target platform.
 pio run -e stm32
+pio check -e stm32
 
 # TODO(martukas) Since this should be done at one level higher than controller, it should probably be scripted not via platformio?
 # Code style / bug-prone pattern checks (eg. clang-tidy)
