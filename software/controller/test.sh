@@ -40,10 +40,14 @@ INTEGRATION_TEST_H=psol_test.h pio run -e integration-test
 pio run -e stm32
 
 # TODO(martukas) Since this should be done at one level higher than controller, it should probably be scripted not via platformio?
-# Code style / bug-prone pattern checks (eg. clang-tidy)
+# Code style / bug-prone pattern checks (eg. clang-tidy and )
 # WARNING: This might sometimes give different results for different people,
 # and different results on CI:
 # See https://community.platformio.org/t/no-version-of-tool-clangtidy-works-on-all-os/13219
 # Feel free to edit .clang_tidy to blacklist problematic checks.
-# TODO(jkff) Currently this fails with a bunch of errors. Need to uncomment and fix errors.
-# pio check -e native --fail-on-defect=high
+
+# Native - cppcheck & clangtidy
+# stm32 - clangtidy
+# TODO(a-vinod) - cppcheck for stm32
+pio check -e native --fail-on-defect=high
+pio check -e stm32 --fail-on-defect=high
