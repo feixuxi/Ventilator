@@ -1,8 +1,6 @@
-Mechanical Design
-=================
+# Mechanical Design
 
-General Assembly Approach
--------------------------
+## General Assembly Approach
 
 The ventilator system is designed such that the internal pneumatic
 assembly can be almost entirely completed with the system removed from
@@ -16,8 +14,7 @@ into the enclosure, connect the wiring for the enclosure cooling fan,
 and seal the enclosure.
 
 The design basis for the functional-critical components of the pneumatic
-system are called out above in the [Pneumatic
-Design](#pneumatic-design) section. When selecting the remaining
+system are called out above in the [Pneumatic Design](../pneumatic-system) section. When selecting the remaining
 components (e.g. plumbing fittings, tubing), the guiding principle was
 to select components that are widely available, so as to avoid
 constrained supply chains. Therefore, rigid plumbing connections use NPT
@@ -35,8 +32,7 @@ other cases (e.g. fasteners, stock thicknesses, custom part
 dimensioning), metric components are used, due to their broader
 availability globally.
 
-Enclosure
----------
+## Enclosure
 
 The following requirements drive the design of the ventilator system
 enclosure:
@@ -61,8 +57,7 @@ The current concept uses basic sheet metal folding processes, which are
 widely available globally. Design details of this assembly can be found
 in 05-01 Production Methods for Custom Components.
 
-Maintenance
------------
+## Maintenance
 
 Several components have known lifetimes that necessitate periodic
 replacement, specifically, filter cartridges, pinch valve tubing, and

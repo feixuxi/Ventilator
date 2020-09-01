@@ -50,7 +50,7 @@ coupled interfaces:
 
 1. [pneumatic system](pneumatic-system)
 2. [electrical system](electrical-system)
-3. [software system](../software/design) (documentation close to code)
+3. [software system](../software/design) (documentation in code directory)
 4. [mechanical assembly](mechanical) to enclose the device and provide structural support.
 
 **#TODO:** Introduce all subsystems properly
@@ -67,7 +67,7 @@ Ventilator Functional Block Diagram
 
 ![](images/functional_block_diagram.png)
 
-[Source](https://docs.google.com/presentation/d/1ye96itSLfdbO9PQT0MSiq6xR2ArqD2MpV1Wj8ORfHeo/edit#slide=id.g7330d84036_1_0)
+[diagram source](https://docs.google.com/presentation/d/1ye96itSLfdbO9PQT0MSiq6xR2ArqD2MpV1Wj8ORfHeo/edit#slide=id.g7330d84036_1_0)
 
 ## Other Documents
 
