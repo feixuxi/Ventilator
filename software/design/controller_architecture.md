@@ -23,11 +23,11 @@ to using C++.
 
 -   In C we’d have to represent a pressure measurement as a number, e.g.
     a float.  This is
-    [error-prone](https://www.google.com/url?q=https://mars.nasa.gov/msp98/news/mco990930.html&sa=D&ust=1598802820324000&usg=AOvVaw1JJGniE2Ej0cV9kzlLRVHm) in
+    [error-prone](https://mars.nasa.gov/msp98/news/mco990930.html) in
     part because the compiler can’t help you keep your units consistent.
     In contrast, our C++ code represents a pressure measurement using an
     explicit
-    [Pressure](https://www.google.com/url?q=https://github.com/RespiraWorks/Ventilator/blob/master/software/common/libs/units/units.h&sa=D&ust=1598802820325000&usg=AOvVaw1lzJ287EMVabEsr3ukSM0a) type.
+    [Pressure](https://github.com/RespiraWorks/Ventilator/blob/master/software/common/libs/units/units.h) type.
     You can create a Pressure from a measurement in kPa or cmH2O and the
     software will do the unit conversions automatically. We also support
     operators between types.  For instance, dividing a Volume by a
@@ -58,12 +58,12 @@ We wrote all of the cycle controller software from scratch, with two
 exceptions:
 
 -   We use
-    [nanopb](https://www.google.com/url?q=https://github.com/nanopb/nanopb&sa=D&ust=1598802820326000&usg=AOvVaw32h1Wx44EbdQLQ1Rf3RZ_P) for
+    [nanopb](https://github.com/nanopb/nanopb) for
     protocol buffer encoding/decoding. Nanopb is an extensively tested
     library used in many projects, and protocol buffers are an industry
     standard for data exchange.
 -   Our PID controller is based on an [Arduino
-    library](https://www.google.com/url?q=https://github.com/br3ttb/Arduino-PID-Library/&sa=D&ust=1598802820327000&usg=AOvVaw1t1c78Ws5W1u3T7RY1ghsN),
+    library](https://github.com/br3ttb/Arduino-PID-Library/),
     although our version has evolved beyond the point of recognition --
     every line of code has been rewritten and our version is several
     times smaller by line count.  It has fewer features, and we have
@@ -123,7 +123,7 @@ that the communication protocol is simply that the controller
 periodically sends all its state to the GUI, and the GUI periodically
 sends all of its state to the controller, overwriting any previous
 state. The protocol is defined
-[here](https://www.google.com/url?q=https://github.com/RespiraWorks/Ventilator/blob/master/software/common/generated_libs/network_protocol/network_protocol.proto&sa=D&ust=1598802820328000&usg=AOvVaw31f9RjZArgBu1iWTBflj7I).
+[here](https://github.com/RespiraWorks/Ventilator/blob/master/software/common/generated_libs/network_protocol/network_protocol.proto).
 
 On each iteration of the main loop, the controller component forwards
 the parameters from the GUI (e.g. PEEP 5, PIP 20, …) to the breath
@@ -230,7 +230,7 @@ expect we will need a more sophisticated algorithm.
 We use the following algorithm to detect inspiratory effort in pressure
 support mode.  First, we wait for flow to become nonnegative during the
 exhale phase. Then we start keeping two [exponentially-weighted moving
-averages](https://www.google.com/url?q=https://en.wikipedia.org/wiki/Moving_average%23Exponential_moving_average&sa=D&ust=1598802820332000&usg=AOvVaw16YnTD2TU9-RmsnOgfXU10) of
+averages](https://en.wikipedia.org/wiki/Moving_average%23Exponential_moving_average) of
 flow. The “slow average” has a small alpha term and thus reacts slowly
 to changes in flow. The “fast average” has a large alpha term and thus
 reacts quickly. We can think of the slow average as characterizing
@@ -241,5 +241,5 @@ certain threshold, that triggers a breath.
 
 This works well on our test lungs, but much more testing is needed to
 see how it performs in more realistic situations. Graphs and a demo
-video are available in [02-1 Performance
-Evaluation](https://www.google.com/url?q=https://docs.google.com/document/d/1g7qLD5qD4BKfR1mcGq7-QY6XE2C9oIIw5GJdUzU31Zg/edit?ts%3D5eefc588%23heading%3Dh.pt7ef8fp4ywf&sa=D&ust=1598802820333000&usg=AOvVaw3PSoAKrxDU1RlhGSshEkvd).
+video are available in
+[02-1 Performance Evaluation](https://docs.google.com/document/d/1g7qLD5qD4BKfR1mcGq7-QY6XE2C9oIIw5GJdUzU31Zg/edit?ts%3D5eefc588%23heading%3Dh.pt7ef8fp4ywf).

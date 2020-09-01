@@ -223,19 +223,17 @@ larger touch target than a secondary function.
 
 #### Fitt’s law
 
-The user experience must follow [Fitt’s
-law](https://www.google.com/url?q=https://www.interaction-design.org/literature/topics/fitts-law&sa=D&ust=1598802820342000&usg=AOvVaw2xPiA5Q91wdMij8jqyT8Le) in
-determining the position and dimension of interactive elements on the
-UI, to ensure operators can perform primary tasks quickly.
+The user experience must follow [Fitt’s law](https://www.interaction-design.org/literature/topics/fitts-law) in
+determining the position and dimension of interactive elements on the UI, to ensure operators can perform primary tasks quickly.
 
 Example:
 
 #### Hick’s law
 
-The user experience must follow [Hick’s
-law](https://www.google.com/url?q=https://www.interaction-design.org/literature/article/hick-s-law-making-the-choice-easier-for-users&sa=D&ust=1598802820343000&usg=AOvVaw1PIeVNgXkrF5mFfc2Q0N_p) in
-structuring content, information architecture, and user flows, to ensure
-operators always have a clear path forward when performing a task.
+The user experience must follow
+[Hick’s law](https://www.interaction-design.org/literature/article/hick-s-law-making-the-choice-easier-for-users) in
+structuring content, information architecture, and user flows, to ensure operators always have a clear path forward when
+performing a task.
 
 Example: touch targets to change or set parameters should be larger than
 the touch target for the menu in the top left corner, as accessing the
