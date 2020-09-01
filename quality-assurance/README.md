@@ -2,6 +2,16 @@
 
 This directory is for regulatory and testing-related assets.
 
+As life support equipment, ventilators must have a high-quality design,
+with design controls, thorough review, and a well documented
+verification plan. Our design is developed under an ISO 14971 process,
+and our software under ISO 62304. We will qualify the device under ISO
+60601-1 once the design has reached a sufficient level of maturity. All
+of these process and design controls are critical to the successful
+design of a product that will be responsible for a human life.
+Conforming with existing quality standards facilitates the regulatory
+approval process for our initial deployment.
+
 ## Testing
 
 Documentation relating to the testing equipment, strategy and test data is in the [testing](testing) subdirectory.

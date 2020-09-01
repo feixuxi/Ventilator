@@ -1,48 +1,74 @@
 # System Architecture
 
--------------
-
-This document contains description of ventilator design implementation and closure of issues which
+This section of the repository contains the description of ventilator design implementation and closure of issues which
 apply at the system level, such as architecture configuration.
 
-## Overview
+## Design Motivations
 
-A ventilator is a device which supports the breathing of a patient who cannot generate
-sufficient respiratory effort to oxygenate their blood. In order to do that, the device
-must generate sufficient pressure to overcome the resistance of the lung tissue and the
-machine itself. It must vary this pressure over time as the lungs fill and then deflate.
-In order to improve oxygenation, ventilators also almost universally apply some
-back-pressure to the lungs (PEEP).
+We approached the design by exploring the medical need for ventilators
+and learned some features cannot be sacrificed in a ventilator that will
+have lasting impact for communities in need of advanced life support
+equipment. However, there are numerous avenues to reduce cost through
+tuning the performance specification to targeted use cases, specifically
+the ability to ventilate high resistance, low compliance lungs at small
+tidal volumes and high respiratory rates. Our design can significantly
+reduce the delivered cost of such a device by 1) reducing some
+performance requirements 2) developing software under a crowd-sourced
+model 3) not charging licensing or royalty fees.
 
-There are dozens of ways to design a ventilator and each has trade-offs. This document
-describes the series of design decisions that led to the final design implementation
-as a means of gaining a finer understanding of the final solution and why it resulted the
-way that it did.
+The design has focused on a pneumatic implementation, where possible
+trying to avoid mechanical complexity (bellows, actuators, etc), placing
+more of the burden on electrical and software design. This is informed
+by our experience that deep expertise in electronics is more globally
+prevalent than similar expertise in mechanical engineering. The device
+is intended to be manufacturable by consumer electronics, automotive,
+refrigeration, or other similar manufacturing entities near to the point
+of use. This approach allows flexibility in selecting manufacturing
+partners who are supported from the engineering side by our globally
+distributed team of volunteer engineers and manufacturing-quality
+professionals. To enforce this process, the design strives to identify
+solid supply chain alternatives for each component and choose components
+that are easily sourced in our targeted regions of use, such as
+Guatemala, India, Kyrgyzstan, and Nigeria.
 
-The first question is where the ventilator is generating pressure to drive into the lungs.
+The custom case, sensors, and valves are designed to use injection
+molded, laser cut, or sheet metal folded parts that then require only
+basic tools to assemble, making them amenable to any number of
+manufacturing facilities around the world. The chosen purchased
+components are readily available through global markets, including
+automotive supply chains (e.g. valves and pressure sensors),
+factory/warehouse supply chains (e.g. blower, tubing and pipe fittings).
+The control and graphics board is designed around a custom PCB, but
+assembled using hand-solderable components if a turnkey PCB supply chain
+were not available (though practically this would likely not be feasible
+from a QA perspective).
 
-Displacement type devices provide a mechanical compression of a fixed volume to drive air
-into the lungs. These are commonly employed in existing ventilators, and they provide a
-high degree of volumetric accuracy and precise control of flow. There are two challenges
-here. First is a question of supply chain, the volume of air which must be delivered into
-a lung is relatively large, as far as traditional cylinders go. The lubricant and gasket
-material must be oxygen compatible, and relatively expensive and sensitive drive
-mechanisms are required. The designs end up rather heavy and expensive. Bellows-type
-devices can be helpful in addressing the volume issue, but are very challenging to design
-for the millions of cycles required, in addition to being difficult to source.
+## High Level Design
 
-![Ventilator Design Overview](assets/functional-block-diagram.png)
+The RespiraWorks Ventilator has four major subsystems with tightly
+coupled interfaces:
+
+1. [pneumatic system](pneumatic-system)
+2. [electrical system](electrical-system)
+3. [software system](../software/design) (documentation close to code)
+4. [mechanical assembly](mechanical) to enclose the device and provide structural support.
+
+**#TODO:** Introduce all subsystems properly
+
+The diagram below shows the conceptual interactions between the
+pneumatic and electrical systems, with software running on both the main
+controller (STM32) and a second independent graphics computer (Raspberry
+Pi 3+/4) controlling the User Interface.
+
+The following sections walk through this in more detail and explain the
+basis for the design selection of various components.
+
+Ventilator Functional Block Diagram
+
+![](images/functional_block_diagram.png)
 
 [Source](https://docs.google.com/presentation/d/1ye96itSLfdbO9PQT0MSiq6xR2ArqD2MpV1Wj8ORfHeo/edit#slide=id.g7330d84036_1_0)
 
-## Overview Documents
+## Other Documents
 
 * [Concept of Operations](conop.md)
-
-## Subsystems
-
-**#TODO:** Introduce each subsystem properly
-
-   * [Pneumatic design](pneumatic-system)
-   * [Electrical design](electrical-system)
-   * **Mechanical design: #TODO**
