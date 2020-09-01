@@ -1,6 +1,9 @@
 # Venturi Flow Sensor
 
-![Rendering](assets/beta_screenshot.png)
+|  Design           |  Implementation   |
+:------------------:|:-----------------:|
+![](assets/beta_screenshot.png)  |  ![](assets/beta_nipples_small.jpg)  |
+
 
 The venturi is used to measure flow by measuring a change in pressure as the flow accelerates through the throat.
 Relative to other pressure sensor types, a venturi flow meter produces the largest signal pressure at the smallest
@@ -16,8 +19,7 @@ the pressure signal measured is not the same as the pressure resistance to flow.
 Currently the design is 3D printed using an SLA printer. This is not the ultimate plan, once the geometry is finalized
 we will experiment with a much simpler orificing venturi, or design for manufacture (DFM) the final venturi.
 
-The venturi outer diameter is defined by the tubing standard. The venturi is available in 3/4" or 5/8" ID tubing, as we
-have moved from 5/8" to 3/4" tubing during the design process.
+The venturi outer diameter is defined by the tubing standard. The current design is made for 3/4" ID tubing.
 
 The pressure sensor we are using, the [MPXV5004DP](https://www.nxp.com/docs/en/data-sheet/MPXV5004G.pdf) (see below) has 2.5 mm or 3/32" barbs. Note that this is not sufficiently close in size to use more common 3mm or 1/8" tubing.
 This model has printed threads to accept an adapter from #10-32 pipe to 3/32" adapter. Other adapters could be incorporated eventually by changing the interface design.
@@ -38,17 +40,6 @@ has a slightly larger internal diameter compared to the 16mm sensor.
 * [.stl format](assets/venturi-3-4.stl)
 * [.iges format](assets/venturi-3-4.iges)
 * [.f3d format](assets/venturi-3-4.f3d)
-
-## 16mm or 5/8" Sensor
-
-The Alpha version is designed to insert into 5/8" ID or 16mm ID tubing.
-
-![Rendering](assets/alpha_screenshot.png)
-
-### Files
-* [.step format](assets/venturi-5-8.step)
-* [.iges format](assets/venturi-5-8.iges)
-* [.f3d format](assets/venturi-5-8.f3d)
 
 ## Transfer Function
 
@@ -134,11 +125,9 @@ have some of these.
 
 ## Assembly
 
-| Alpha | Beta |
-|-------|------|
-| ![Nipples](assets/alpha-nipples.jpg) | ![Nipples](assets/beta-nipples.jpg) |
+**TODO:** pictures of assembly process
 
-
+**TODO:** reaming might be required
 
 Screw the nipples into the 3d-printed venturi.
 There are threads in the print but they don’t always come out right if resin gets trapped in the grooves while it prints.
@@ -148,7 +137,7 @@ since there is enough depth in the holes and the threads are short.
 In the latest tested version, no hand-tapping was required to insert nipples. With good enough 3d printing, this step
 should not be necessary.
 
-**#TODO:** instructions on connecting tubes to sensors
+**TODO:** instructions on connecting tubes to sensors
 
 ## Verification
 
