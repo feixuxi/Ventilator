@@ -12,7 +12,7 @@ WORKDIR /root/Ventilator
 COPY . ./
 
 RUN ln -s /usr/bin/clang-6.0 /usr/bin/clang && \
-    ln -s /usr/bin/clang++-6.0 /usr/bin/clang++ && \
+    ln -s /usr/bin/clang++-6.0 /usr/bin/clang++
 
 CMD /bin/bash \
     software/gui/gui.sh --install && \
