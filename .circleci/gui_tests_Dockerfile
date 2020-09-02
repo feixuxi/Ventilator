@@ -2,9 +2,15 @@
 
 FROM debian:buster
 
-RUN apt-get update && apt-get install build-essential python-pip lcov git curl -y \
-    && pip install -U pip \
-    && pip install codecov
+RUN apt-get update && \
+    apt-get install build-essential python-pip lcov git curl \
+    clang-tidy-6.0 clang++-6.0 bear -y && \
+    pip install -U pip && \
+    pip install codecov
+
+RUN ln -s /usr/bin/clang++-6.0 /usr/bin/clang++ \
+    ln -s /usr/bin/clang-6.0 /usr/bin/clang \ 
+    ln -s /usr/bin/llc-6.0 /usr/bin/llc
 
 WORKDIR /root/Ventilator
 COPY . ./
