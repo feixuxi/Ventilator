@@ -1,7 +1,5 @@
 # Pizza Build
 
-**WARNING: This is not intended to be used on patients and lacks a number of safety features.**
-
 This is a ventilator prototype for testing and development.
 The build consists of a functional ventilator pneumatic assembly with controller and user interface. This build is adequate for integration and systems testing.
 
@@ -14,25 +12,6 @@ It can also come in various configurations, depending on your testing needs:
 | Solenoid valve setup  |  Pinch valve setup   | Blower bypass setup     |
 |:---------------------:|:--------------------:|:-----------------------:|
 ![](images/photo-solenoid.jpg) |![](images/photo-pinch.jpg)  |![](images/photo-advanced.jpg)  |
-
-**DISCLAIMER:** These are live documents.
-There are duplicate and alternative items for undecided aspects of the physical design.
-
-RespiraWorks may or may not compensate you for any of these parts if you choose to buy them. Please connect with Edwin, Martin or Ethan first.
-If you decide to buy them, do so at your own risk... oh, and thank you ;).**
-
-## Planning
-
-Before you start, it would be wise to plan the configuration you will build and order adequate amounts of components.
-Try to plan for what you'll need in a few weeks rather than what you need now.
-Supply chains are quirky and shipping times can be long, so your surprise at having missed something will soon turn to frustration.
-The goal of this documentation has been precisely to help you avoid unproductive waiting. **PLAN NOW!**
-
-Read over as much of the following documentation as you can and then come back to this point.
-
-Now, contact the team to see if we have components in stock that we can send you.
-Once you know what you are getting from "headquarters", only then should you start filling up your baskets.
-Also ask the team if anything should be ordered on the company account.
 
 ## Essentials
 
