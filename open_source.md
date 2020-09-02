@@ -1,6 +1,7 @@
-# RespiraWorks Open Source
+# RespiraWorks Open Source Philosophy
 
-RespraWorks is an Apache 2-licensed open-source project (both hardware and software), developed in the open.
+RespraWorks is an [Apache 2-licensed](https://opensource.org/licenses/Apache-2.0) open-source project (both hardware
+and software), developed in the open.
 
 A number of open-source veterans work on the project, and we take openness seriously, both in our software license and
 in the way we work as a project.
@@ -25,7 +26,7 @@ A permissive license doesn't have this problem, because you can take the code an
 it.  You don't have to share your changes under the same license.
 
 The perceived risk of this is that an organization might take the open-source code, make many changes to it, and not
-share those changes with the community -- thus harming the overall project.
+share those changes with the community - thus harming the overall project.
 
 In our experience, the risk of this is low.  The value of an open-source project is not just in its source code, but
 also in the community: the people who understand the code and can help.  If you make a closed-source fork of the code,

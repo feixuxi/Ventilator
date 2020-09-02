@@ -64,10 +64,9 @@ The following sections walk through this in more detail and explain the
 basis for the design selection of various components.
 
 Ventilator Functional Block Diagram
+([source](https://docs.google.com/presentation/d/1ye96itSLfdbO9PQT0MSiq6xR2ArqD2MpV1Wj8ORfHeo/edit#slide=id.g7330d84036_1_0))
 
 ![](images/functional_block_diagram.png)
-
-[diagram source](https://docs.google.com/presentation/d/1ye96itSLfdbO9PQT0MSiq6xR2ArqD2MpV1Wj8ORfHeo/edit#slide=id.g7330d84036_1_0)
 
 ## Other Documents
 

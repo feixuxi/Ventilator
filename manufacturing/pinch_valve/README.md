@@ -117,8 +117,12 @@ Rotor Assembly                     |  Base Assembly           |
 ![Assembled](assets/rotor.jpg)|  ![Assembled](assets/assembled.jpg)
 3mm hex and 2.5mm hex driver are required for assembling rotor.|  2mm hex driver is required for attaching base.
 
-Assembled it should look something like this, ready to be integrated:
+Each pinch valve must also include some additional wiring and a driver board for controlling the stepper motor. A
+pigtail with male dupont connectors must be manufactured for interfacing to the driver board. Furthermore, since a
+single ventilator contains two pinch valves, each must come with its own driver board configured with 0-ohm resistors
+soldered appropriately. All of this is documented in a subset of the PCB documentation
+[here](../../pcb/rev1_export/stepper_driver_setup.md).
+
+With the tygon tube and clamps, a single pinch valve sub assembly appears like so:
 
 ![Assembled](assets/full_assembly.jpg)
-
-Instructions on wiring the pinch valve to the PCB can be found [here](../../pcb/rev1_export/stepper_driver_setup.md).
