@@ -1,8 +1,8 @@
 # Stepper Proportional Pinch Valve
 
-  CAD File         |  Assembled         | In action
-:------------------:|:-----------------:|:-------------------------:
-![](assets/rendering-1-6.png)  |  ![](assets/assembled_smaller.jpg)  |  ![](assets/animation.gif)
+|   CAD File         |  Assembled        |  In action    |
+|:------------------:|:-----------------:|:-------------:|
+![](assets/rendering-1-6.png)  |  ![](assets/assembled_smaller.jpg)  |  ![](assets/animation.gif) |
 
 ## Overview
 

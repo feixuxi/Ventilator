@@ -12,7 +12,7 @@ Broadly there are two types of ventilator builds we are currently testing with:
 
 | Pizza build  |  Enclosed build   |
 |:---------------------:|:--------------------:|
-![](pizza_build/graphics/3_pizzas_small.jpg) |![](enclosed_build/images/India_build_yellow.jpeg) |
+![](pizza_build/images/assembled.jpg) |![](enclosed_build/images/India_build_yellow.jpeg) |
 
 ## Sub-assemblies
 

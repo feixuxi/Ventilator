@@ -96,7 +96,7 @@ In particular:
 This testing lab will remain functional for the duration of further ventilator design through final product deployment
 and beyond, while any software development is taking place.
 
-![](../../manufacturing/pizza_build/graphics/3_pizzas_small.jpg)
+![](../../manufacturing/pizza_build/images/3_pizzas_small.jpg)
 
 Some of the developed test infrastructure will likely inform the development of validation and testing suites for the
 manufacturers of the final product.
