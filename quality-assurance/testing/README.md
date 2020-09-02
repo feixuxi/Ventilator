@@ -28,6 +28,9 @@ elsewhere, the pinch valve design results in cyclical stress both on the valve a
 well the design will hold up over time. We have had one pinch valve running continuously for a few weeks and are doing
 performance testing to see how it compares to fresh valves.
 
+To date (2020.09.01), 1080 hours and 3.9 million cycles, or 12 weeks of continuous ventilator operation at 30 bpm,
+equivalent to 2160 hours of continuous use. Testing continues 24/7.
+
 **TODO:** link to life-leader tests
 
 ## Status of SiL (Software-in-the-Loop) Testing
@@ -45,7 +48,7 @@ earlier version of Visual Studio to compile the external controller for it to in
 support all of the C++ features that we are using. How best to work around this limitation without adding so much
 overhead that SIL testing becomes more work than it is worth is still to be determined.
 
-**TODO:** link to modelica docs
+[More on modelica simulations](../../design/modelica.md)
 
 ## Status of Continuous Integration
 
