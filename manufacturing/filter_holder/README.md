@@ -22,7 +22,7 @@ point for the filter cartridge hold-down parts.
 The replaceable filter cartridges are held in place by one of two component options - for the device inlet and outlet,
 a simple screw-down tab holds the filter in place; for the patient breathing circuit connectors, a 22mm cone (male) port
 is provided to interface with standard 22mm socket (female) breathing circuits. The patient breathing circuit connector
-cone is dimensioned according to [ISO 5356-1](https://www.iso.org/obp/ui%23iso:std:iso:5356:-1:ed-4:v1:en).
+cone is dimensioned according to [ISO 5356-1](https://www.iso.org/obp/ui#iso:std:iso:5356:-1:ed-4:v1:en).
 
 # Implementation
 
