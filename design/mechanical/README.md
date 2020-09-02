@@ -26,7 +26,7 @@ based on reports from our manufacturing partners in India and Guatemala,
 which indicated that NPT components are commonly available in both
 markets, as well as in the US where most of our prototyping activities
 take place. Additionally, these connections are sized such that either
-¾” ID tubing or 19mm ID tubing can be used, allowing for flexibility in
+¾" ID tubing or 19mm ID tubing can be used, allowing for flexibility in
 use of metric or imperial components according to availability. In all
 other cases (e.g. fasteners, stock thicknesses, custom part
 dimensioning), metric components are used, due to their broader

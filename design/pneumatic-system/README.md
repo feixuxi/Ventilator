@@ -257,7 +257,7 @@ found in the 01-02 Progress Status Update.
 An additional advantageous feature is that the valve is closed through a
 stepper motor which does not maintain its state when power is lost. The
 elastic modulus of the tubing, coupled with the fact that the rotor can
-not reach a “locked” position is sufficient to force the valve open if
+not reach a "locked" position is sufficient to force the valve open if
 the power fails—the
 valve is normally open, and allows the exhale valve to also function as
 an anti-asphyxia pathway.
@@ -337,7 +337,7 @@ manufacturing processes (e.g. injection molding).
 
 The venturi design was based around a garden fertilizer injector.
  Though all initial prototypes have been 3D printed, the required
-geometry is almost identical to a ½” garden venturi, which can be
+geometry is almost identical to a ½" garden venturi, which can be
 purchased at quantity for 2-4 USD / pc.
 
 Venturis produce a large signal ratio.  In ours, a maximum pressure drop

@@ -22,4 +22,8 @@ Documentation relating to the testing equipment, strategy and test data is in th
 about regulatory documentation.
 
 One of the parts of this is Software risk analysis - as begun in
-[this spreadsheet](https://docs.google.com/spreadsheets/d/1qlTV5HqxnhlJXuhbSsEIfU-YwnN6PzgASv9_2dc5-cM/edit?usp=sharing) by jam@
+[this spreadsheet](https://docs.google.com/spreadsheets/d/1qlTV5HqxnhlJXuhbSsEIfU-YwnN6PzgASv9_2dc5-cM/edit?usp=sharing) by @jam
+
+## User documentation
+
+There is a tentative outline for [user documentation](user_documentation.md).

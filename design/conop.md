@@ -9,7 +9,7 @@
 ## Document Content
 
 - Summary of key constraints
-- Understanding of current intra-breath cycle control for the development (“Pizza”) board.
+- Understanding of current intra-breath cycle control for the development ("Pizza") board.
 - Preliminary description of system operation for next iteration of system with O2 mixing
 - Envisioned Inter and Intra-breath cycle control states
 - Open questions / points to resolve.
@@ -18,7 +18,7 @@
 
 ![Functional Block Diagram](assets/functional-block-diagram.png)
 
-## “Pizza Build” Intra-breath Cycle Control
+## "Pizza Build" Intra-breath Cycle Control
 
 The Alpha system flow path is:
 - Fan
@@ -40,4 +40,4 @@ Exhale valve moves to exhale position (fully open)
 Controlled adjusts pressure set point for closed loop control to PEEP pressure - controller adjusts blower speed to meet PEEP.
 PEEP pressure target is maintained for a specified amount of time - then transition back to inhale
 
-Alpha build has no inter-breath or “adaptive” control on top of this.
+Alpha build has no inter-breath or "adaptive" control on top of this.

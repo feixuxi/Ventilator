@@ -27,7 +27,7 @@ to using C++.
     part because the compiler can’t help you keep your units consistent.
     In contrast, our C++ code represents a pressure measurement using an
     explicit
-    [Pressure](https://github.com/RespiraWorks/Ventilator/blob/master/software/common/libs/units/units.h) type.
+    [Pressure](../common/libs/units/units.h) type.
     You can create a Pressure from a measurement in kPa or cmH2O and the
     software will do the unit conversions automatically. We also support
     operators between types.  For instance, dividing a Volume by a
@@ -40,7 +40,7 @@ to using C++.
     discriminated unions instead of C’s union construct.  We also use
     std::optional throughout the code to represent a value that may not
     be present.  This is much safer than most C solutions (e.g. using a
-    sentinel value like -1 or NaN to mean “not present”).
+    sentinel value like -1 or NaN to mean "not present").
 -   Some language features of C++ are inherently safer than the
     respective features of plain C. For example, C++ requires the
     programmer to be explicit about type conversion in cases where the
@@ -123,12 +123,12 @@ that the communication protocol is simply that the controller
 periodically sends all its state to the GUI, and the GUI periodically
 sends all of its state to the controller, overwriting any previous
 state. The protocol is defined
-[here](https://github.com/RespiraWorks/Ventilator/blob/master/software/common/generated_libs/network_protocol/network_protocol.proto).
+[here](../common/generated_libs/network_protocol/network_protocol.proto).
 
 On each iteration of the main loop, the controller component forwards
 the parameters from the GUI (e.g. PEEP 5, PIP 20, …) to the breath
-FSM (finite state machine, see below), which responds with a “desired
-system state”, the physical properties we want the pneumatic system to
+FSM (finite state machine, see below), which responds with a "desired
+system state", the physical properties we want the pneumatic system to
 have at this moment. Since we have implemented pressure-controlled
 ventilation modes, the main physical property to achieve is patient
 pressure. The controller reads from the sensors, uses PID to calculate
@@ -137,10 +137,10 @@ desired state, and forwards these to the actuator.
 
 The breath FSM (finite state machine) translates ventilator parameters
 into a timeseries of desired states of the ventilator’s pneumatic
-system. For example, the ventilator parameters “command pressure mode
-with PEEP 5, PIP 20, RR 12 bpm, I:E 0.25” translates to the timeseries
-“start pressure at 5 cmH2O, linearly ramping up to 20 cmH2O over 100ms;
-sit at 20 cmH2O for 900ms; then drop to 5 cmH2O for 4s”.
+system. For example, the ventilator parameters "command pressure mode
+with PEEP 5, PIP 20, RR 12 bpm, I:E 0.25" translates to the timeseries
+"start pressure at 5 cmH2O, linearly ramping up to 20 cmH2O over 100ms;
+sit at 20 cmH2O for 900ms; then drop to 5 cmH2O for 4s".
 
 The breath FSM is also responsible for inspiratory effort detection in
 pressure assist mode. In this case, the time series would keep pressure
@@ -154,8 +154,8 @@ sensors and translating the readings into two flow measurements (one for
 each venturi) and one patient pressure measurement.
 
 The actuators module receives a set of commands from the controller for
-every actuator in the system, e.g. “blower speed 90%, inspiratory pinch
-valve 28% open, etc.”, and forwards them down to HAL to be acted upon.
+every actuator in the system, e.g. "blower speed 90%, inspiratory pinch
+valve 28% open, etc.", and forwards them down to HAL to be acted upon.
 
 The actuators module might seem like an unnecessary component -- why
 can’t the controller simply call into HAL itself?  There are two
@@ -212,7 +212,7 @@ relatively high error at low flows. A simple way to correct for this
 would be to set volume at the beginning of every breath to 0, but this
 introduces a discontinuity in the graph at each breath, which looks
 wrong. And fundamentally it does not solve the problem; one can still
-observe that volume measurements are “sloped”.
+observe that volume measurements are "sloped".
 
 Our volume zeroing algorithm addresses this. At the start of each
 breath, we predict what the volume would be at the next breath if the
@@ -225,21 +225,60 @@ blockage, etc. We also need to understand better users’ expectations
 about how flow leakage should show up in the ventilator’s graphs. We
 expect we will need a more sophisticated algorithm.
 
+We track volume by integrating flow over time.  Getting an accurate flow measurement is challenging with our current
+hardware, especially at low flow rates, where the venturi's SNR is worst.
+
+We currently use a "big hammer" to address this, essentially forcing volume to 0 at each breath boundary.  This may hide
+leaks and other clinically-relevant data from users, and so this algorithm likely needs to be improved in the future,
+potentially in combination with different or additional sensors.
+
+
 #### Inspiratory effort detection
 
 We use the following algorithm to detect inspiratory effort in pressure
 support mode.  First, we wait for flow to become nonnegative during the
 exhale phase. Then we start keeping two [exponentially-weighted moving
 averages](https://en.wikipedia.org/wiki/Moving_average%23Exponential_moving_average) of
-flow. The “slow average” has a small alpha term and thus reacts slowly
-to changes in flow. The “fast average” has a large alpha term and thus
+flow. The "slow average" has a small alpha term and thus reacts slowly
+to changes in flow. The "fast average" has a large alpha term and thus
 reacts quickly. We can think of the slow average as characterizing
-“normal flow” during the expiratory cycle (which we’ve observed on test
+"normal flow" during the expiratory cycle (which we’ve observed on test
 lungs does change, but slowly), while the fast average calculates
-“current flow”.  When the fast average exceeds the slow average by a
+"current flow".  When the fast average exceeds the slow average by a
 certain threshold, that triggers a breath.
 
 This works well on our test lungs, but much more testing is needed to
 see how it performs in more realistic situations. Graphs and a demo
 video are available in
 [02-1 Performance Evaluation](https://docs.google.com/document/d/1g7qLD5qD4BKfR1mcGq7-QY6XE2C9oIIw5GJdUzU31Zg/edit?ts%3D5eefc588%23heading%3Dh.pt7ef8fp4ywf).
+
+
+### Status of Oxygen Flow Control
+
+Our ventilator can currently deliver 100% oxygen (supplied by an external source of pressurized oxygen) or ambient air
+(supplied via our blower fan), but cannot currently mix these two gasses.
+
+Variable FiO2 requires a more complicated control scheme, controlling both the air proportional valve and the oxygen
+proportional solenoid together. We are currently exploring two controller schemes for achieving this.  We've tried both
+of these in the modelica model, though neither has been tried on hardware yet.
+
+The first controller scheme is to ratio-control the two valves. In this scheme, a single PID commands both the air valve
+and the oxygen valve simultaneously to achieve the desired pressure targets in the different breathe stages. The mapping
+from the PID command to the actual valve command is determined by a ratio that is adjusted across breathe cycles by a
+separate PID controller designed to achieve the desired FiO2.
+
+The challenge with this scheme is that the current valves (the oxygen proportional solenoid and the air proportional
+pinch valve) have extremely different response times, which may make it difficult to achieve stable control.
+
+An alternative scheme is to use one of the valves to control pressure and the other valve to control FiO2. The valve
+that is controlling pressure would be controlled by a PID during the inhale and exhale phases. The valve that is
+controlling FiO2 would have a constant value across inhale and a constant value across exhale - these values would then
+be adjusted by the FiO2 PID across breaths. For this scheme, if the FiO2 were below about 70-80%, then the air valve
+would be used to control pressure and the oxygen valve would be used to manage FiO2; for higher FiO2, this would be
+reversed.
+
+The benefit of this approach is that it avoids trying to control both valves simultaneously. The downside of this
+approach is that it can lead to greater FiO2 variability over a breath, has a greater risk of pressure over/undershoot,
+and, for stability reasons, will likely necessitate a slower rate of FiO2 change. Based on discussions with doctors,
+achieving the necessary FiO2 within 30-60s was deemed acceptable, meaning that a safer control scheme that minimizes
+over/undershoot risk by adjusting FiO2 more slowly may be acceptable.

@@ -15,8 +15,8 @@ written in C++.
 The Raspberry Pi runs Linux and is used for displaying the GUI. The
 software we wrote is a Qt app, also written in C++. The app displays a
 GUI on the ventilator’s touch screen, showing sensor data received from
-the controller. Users set high-level parameters via the GUI (e.g. “PIP
-20 cmH2O”), and then the GUI software commands the controller to meet
+the controller. Users set high-level parameters via the GUI (e.g. "PIP
+20 cmH2O"), and then the GUI software commands the controller to meet
 these parameters. The GUI software is also responsible for calculating
 alarms and readings derived from raw sensor values (such as measured
 PIP/PEEP).
@@ -69,11 +69,11 @@ resends, detection of missed packets, etc.
 
 This simplified communication protocol avoids failure modes present in
 other protocols.  For instance, imagine a different, stateful protocol
-where one command the GUI can send is “set PIP to X”.  Suppose the GUI
-sends two packets, “set PIP to 15” and “set PIP to 20”, and imagine that
+where one command the GUI can send is "set PIP to X".  Suppose the GUI
+sends two packets, "set PIP to 15" and "set PIP to 20", and imagine that
 the first one gets corrupted or lost on the wire.  The controller must
-not accept the “PIP 20” command until it receives and applies the “PIP
-15” command, otherwise the final PIP will be 15!  This requires buffers,
+not accept the "PIP 20" command until it receives and applies the "PIP
+15" command, otherwise the final PIP will be 15!  This requires buffers,
 resends, and complex logic that, in the limit, looks much like a full
 implementation of TCP.
 

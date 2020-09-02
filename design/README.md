@@ -71,4 +71,6 @@ Ventilator Functional Block Diagram
 
 ## Other Documents
 
+* [Design rationales](design-rationales.md)
 * [Concept of Operations](conop.md)
+* [Systems modeling in Modelica](modelica.md)

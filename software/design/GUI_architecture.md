@@ -2,8 +2,8 @@
 
 The UI controller runs on a Raspberry Pi with a touchscreen and is
 written in C++17 using QT as the user interface framework. The reasoning
-behind this technology choice is described above, in the “Software
-Design” section. Below we discuss the GUI features and architecture in
+behind this technology choice is described above, in the "Software
+Design" section. Below we discuss the GUI features and architecture in
 more detail.
 
 There is a page on [User interface requirements](UI_requirements.md).
@@ -51,7 +51,7 @@ The UI implements an alarm subsystem based on ISO-60601-1-8.
     until the alarm is acknowledged. If there are multiple
     unacknowledged alarms, the audio is based on the highest-priority
     one.
--   In ISO terminology, the audio signal is “latching”: it persists even
+-   In ISO terminology, the audio signal is "latching": it persists even
     if the alarm condition is no longer active, so that the operator is
     made aware of a prior hazardous condition even if the condition
     activates sporadically and disappears before the operator walks up
@@ -77,7 +77,7 @@ Architecture of the RespiraWorks GUI
 
 The GUI talks to the Cycle Controller over the serial bus, sending
 commanded values of ventilation mode and ventilation parameters, and
-receiving current sensor readings as well as a “breath id” value that is
+receiving current sensor readings as well as a "breath id" value that is
 used to establish breath boundaries for computing per-breath signals.
 
 The state of the GUI is encapsulated in a State Container object, which
@@ -96,7 +96,7 @@ Breath signals and the alarm subsystem deserve further discussion.
 #### Breath signals
 
 As noted above, each set of sensor readings obtained from the Cycle
-Controller includes a “breath id” value, which changes on breath
+Controller includes a "breath id" value, which changes on breath
 boundaries. Breath boundaries are mandated or detected by the Cycle
 Controller. This value can be used to partition the stream of sensor
 readings into intervals corresponding to a single breath, letting us
@@ -119,14 +119,14 @@ alarms.
 There is also a proposed architecture for the [GUI alarm subsystem](GUI_alarm_subsystem.md).
 
 The UI controller is responsible for calculating and signaling all
-alarms, with the exception of a planned “UI controller not responding”
+alarms, with the exception of a planned "UI controller not responding"
 alarm. The decision to place alarms into the UI controller, as opposed
 to the Cycle controller, was intended to minimize the amount of code in
 the cycle controller, the more safety-critical component of the system.
 
-The alarm subsystem is based on ISO-60601-1-8 “General requirements,
+The alarm subsystem is based on ISO-60601-1-8 "General requirements,
 tests and guidance for alarm systems in medical electrical equipment and
-medical electrical systems”. The key concepts are alarm conditions --
+medical electrical systems". The key concepts are alarm conditions --
 potentially hazardous conditions requiring operator awareness or action
 -- which can have different priority, and audio and visual alarm
 signals.
