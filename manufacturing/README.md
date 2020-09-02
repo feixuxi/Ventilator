@@ -3,6 +3,13 @@
 This section of the repository describes the physical design of the ventilator and the process of manufacturing the
 components and fully assembled units.
 
+One of the foundational principles of the ventilator design was to avoid, where possible, custom components. However,
+for several parts, it was unavoidable to design a new component if price, availability, and functional performance
+requirements could not be achieved with already-available components. These pages describe the few components that
+have been custom designed for this application. The manufacturing process for the prototypes is discussed, as well as
+plans and features for production at larger volumes, with an approximate scale-point of 1,000 units. For smaller orders
+of less than 100 units production, some of the prototype production methods may prove more cost- and time-effective.
+
 Broadly there are two types of ventilator builds we are currently testing with:
 - open table-top prototypes for testing components and various pneumatic configurations, kindly referred to as "pizza build"
 - "enclosed build", more like the final product; more expensive to make and slower to iterate on
@@ -21,7 +28,9 @@ generally be similar for the enclosed build, but documentation might be lagging.
 
 For each component, the goal is to document:
 * the reasoning for the design
-* production process and common problems to watch out for
+* files or links to original CAD, derived step files and 3d-printer files with scaffolding
+* prototype fabrication process and common problems to watch out for
+* plans for fabrication at scale
 * link characterization tests and data
 * link to software that interfaces with component
 * link to any validation tests that are available to evaluate individual assemblies
