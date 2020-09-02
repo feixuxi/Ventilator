@@ -22,7 +22,7 @@ systems and put them in the hands of those who need them most.
 
 | First enclosed prototype in India    | Rendering of upcoming build    |
 |:---:|:---:|
-|![](manufacturing/enclosed_build/graphics/India_build_yellow.jpeg) | ![](manufacturing/enclosed_build/graphics/enclosure_CAD_2020_august.png)  |
+|![](manufacturing/enclosed_build/images/India_build_yellow.jpeg) | ![](manufacturing/enclosed_build/images/enclosed_CAD_2020_august.png)  |
 
 
 ## Design Goals
