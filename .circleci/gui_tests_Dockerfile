@@ -9,8 +9,7 @@ RUN apt-get update && \
     pip install codecov
 
 RUN ln -s /usr/bin/clang++-6.0 /usr/bin/clang++ \
-    ln -s /usr/bin/clang-6.0 /usr/bin/clang \ 
-    ln -s /usr/bin/llc-6.0 /usr/bin/llc
+    ln -s /usr/bin/clang-6.0 /usr/bin/clang 
 
 WORKDIR /root/Ventilator
 COPY . ./
