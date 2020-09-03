@@ -21,16 +21,17 @@ these parameters. The GUI software is also responsible for calculating
 alarms and readings derived from raw sensor values (such as measured
 PIP/PEEP).
 
-We chose to use two separate computers for three reasons. First, two
-computers reduces the amount of software that is immediately hazardous
+We chose to use two separate computers for three reasons.
+1. Two computers reduces the amount of software that is immediately hazardous
 to the patient. Since our UI code runs on a separate device with no
 direct access to the ventilator’s actuators, a bug or crash in it is
 less likely to cause immediate harm; the ventilator will just keep
-running with the old params (and, in the future, sound an alarm).
-Second, this design saves time and money because it allows us to use
+running with the most recent parameters (and, in the future, sound an alarm).
+2. This design saves time and money because it allows us to use
 large libraries like Linux and Qt, which make it easier to develop the
 GUI, but would likely be unacceptable in a patient-critical module like
-the cycle controller. Third, having two modules adds a level of
+the cycle controller.
+3. Having two modules adds a level of
 redundancy. If the microcontroller crashes, it will immediately receive
 new commands from the Raspberry Pi, and the Pi can raise an alarm.
 Similarly, if the Pi crashes, the ventilator continues running with the
@@ -50,8 +51,8 @@ tests that would otherwise be prohibitively time-consuming, for instance
 running each commit against many combinations of ventilator parameters
 plus lung compliances.
 
-Besides a detailed user manual and maintenance plan, the device also
-comes with a robust self-test mode.  This ensures that produced
+Besides a detailed user manual and maintenance plan, the device will also
+come with a robust self-test mode.  This ensures that produced
 ventilators achieve necessary safety levels before they are used with
 patients and will allow users to check the health of the device over its
 lifetime. A cryptographic hash will be released with the approved
@@ -62,18 +63,18 @@ they are loading to the device.
 ## Communication Between Pi and Microcontroller
 
 The microcontroller and Raspberry Pi communicate over a serial bus using
-a simple, predictable protocol. Every \~50ms, the microcontroller sends
-its current state to the Raspberry Pi, and every \~50ms, the Raspberry
+a simple, predictable protocol. Every ~50ms, the microcontroller sends
+its current state to the Raspberry Pi, and every ~50ms, the Raspberry
 Pi sends its full state to the microcontroller.  There are no ACKs,
 resends, detection of missed packets, etc.
 
 This simplified communication protocol avoids failure modes present in
 other protocols.  For instance, imagine a different, stateful protocol
-where one command the GUI can send is "set PIP to X".  Suppose the GUI
-sends two packets, "set PIP to 15" and "set PIP to 20", and imagine that
+where one command the GUI can send is `set PIP to X`.  Suppose the GUI
+sends two packets, `set PIP to 15` and `set PIP to 20`, and imagine that
 the first one gets corrupted or lost on the wire.  The controller must
-not accept the "PIP 20" command until it receives and applies the "PIP
-15" command, otherwise the final PIP will be 15!  This requires buffers,
+not accept the `PIP 20` command until it receives and applies the `PIP
+15` command, otherwise the final PIP will be 15!  This requires buffers,
 resends, and complex logic that, in the limit, looks much like a full
 implementation of TCP.
 

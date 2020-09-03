@@ -59,10 +59,6 @@ A serial communication link using checksums to ensure data integrity
 provides reliable communication of settings and data between the two
 computing elements.
 
-In the event of a system crash or failure in the UI Computer, the Cycle
-Controller will continue to operate the ventilator with the most recent
-valid settings received from the UI Computer.
-
 Each computing element has its own alarm system as well as a watchdog
 timer.  If either computing element becomes non-responsive, the
 watchdogs will put it into a safe state and restart it.  The UI Computer
