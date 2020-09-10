@@ -4,7 +4,7 @@ FROM debian:buster
 
 RUN apt-get update && \
     apt-get install build-essential python-pip lcov git curl \
-    clang-6.0 clang++-6.0 clang-tidy-6.0 bear -y && \
+    bear cppcheck clang-tidy -y && \
     pip install -U pip && \
     pip install codecov
 
