@@ -153,7 +153,7 @@ if [ "$1" == "--build" ]; then
     j_opt="-j"
   fi
 
-  pushd build && qmake -spec linux-clang $config_opt .. && bear make $j_opt && popd
+  pushd build && qmake $config_opt .. && bear make $j_opt && popd
 
   exit 0
 fi
