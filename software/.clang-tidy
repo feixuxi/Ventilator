@@ -15,7 +15,6 @@ Checks: >
   -google-readability-todo,
   -misc-unused-parameters,
   -*-braces-around-statements,
-  -google-readability-casting,
   -readability-else-after-return,
   -modernize-use-auto,
   -modernize-use-trailing-return-type,
