@@ -19,7 +19,7 @@ CMD /bin/bash \
     software/gui/gui.sh --build -f -j && \
     software/gui/gui.sh --test -f -x && \
     cd software/gui && \
-    cppcheck -ithird_party . --error-exitcode=1 && \
+    cppcheck -ithird_party -ibuild . --error-exitcode=1 && \
     cd build && \
     cppcheck --project=compile_commands.json -i../../src/third_party . --error-exitcode=1 && \
     run-clang-tidy-7.py -p . && \
