@@ -112,7 +112,12 @@ if [ "$1" == "--install" ]; then
         libqt5serialport5-dev \
         libqt5serialport5 \
         qtdeclarative5-dev-tools \
-        xvfb
+        xvfb \
+	bear \
+	cppcheck \
+	clang-tidy
+  ln -s /usr/bin/clang-6.0 /usr/bin/clang
+  ln -s /usr/bin/clang++-6.0 /usr/bin/clang++
   fi
   exit 0
 fi
@@ -131,8 +136,8 @@ fi
 #########
 # BUILD #
 #########
-
 if [ "$1" == "--build" ]; then
+  cppcheck -ithird_party -ibuild .
 
   if [ "$EUID" -eq 0 ] && [ "$2" != "-f" ]; then
     echo "Please do not run build with root privileges!"
@@ -153,7 +158,7 @@ if [ "$1" == "--build" ]; then
     j_opt="-j"
   fi
 
-  pushd build && qmake $config_opt .. && bear make $j_opt && popd
+  pushd build && qmake $config_opt .. && bear make $j_opt && cppcheck --project=compile_commands.json -i../../src/third_party . && run-clang-tidy-7.py -p . && popd
 
   exit 0
 fi
