@@ -156,7 +156,7 @@ if [ "$1" == "--build" ]; then
     j_opt="-j"
   fi
 
-  pushd build && qmake $config_opt .. && bear make $j_opt && cppcheck --project=compile_commands.json -i../../src/third_party . && run-clang-tidy-7.py -p . && popd
+  pushd build && qmake $config_opt .. && bear make $j_opt && cppcheck --project=compile_commands.json -i../../src/third_party . && run-clang-tidy-10.py -p . && popd
 
   exit 0
 fi
