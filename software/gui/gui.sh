@@ -115,7 +115,7 @@ if [ "$1" == "--install" ]; then
         xvfb \
 	bear \
 	cppcheck \
-	clang-tidy-10
+	clang-tidy-7
   fi
   exit 0
 fi
@@ -142,6 +142,7 @@ if [ "$1" == "--build" ]; then
     exit 1
   fi
 
+  curl https://raw.githubusercontent.com/llvm-mirror/clang-tools-extra/master/clang-tidy/tool/run-clang-tidy.py > run-clang-tidy.py
   create_clean_directory build
   qmake -unset QMAKEFEATURES
   git submodule update --init --recursive
@@ -156,7 +157,7 @@ if [ "$1" == "--build" ]; then
     j_opt="-j"
   fi
 
-  pushd build && qmake $config_opt .. && bear make $j_opt && cppcheck --project=compile_commands.json -i../../src/third_party . && run-clang-tidy-10.py -p . && popd
+  pushd build && qmake $config_opt .. && bear make $j_opt && cppcheck --project=compile_commands.json -i../../src/third_party . && python run-clang-tidy.py -p . && popd
 
   exit 0
 fi
