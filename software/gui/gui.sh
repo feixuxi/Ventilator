@@ -115,9 +115,7 @@ if [ "$1" == "--install" ]; then
         xvfb \
 	bear \
 	cppcheck \
-	clang-tidy
-  ln -s /usr/bin/clang-6.0 /usr/bin/clang
-  ln -s /usr/bin/clang++-6.0 /usr/bin/clang++
+	clang-tidy-10
   fi
   exit 0
 fi
