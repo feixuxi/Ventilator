@@ -159,18 +159,20 @@ if [ "$1" == "--build" ]; then
 
   pushd build && qmake $config_opt .. && bear make $j_opt && popd
   
-  cppcheck --project=build/compile_commands.json -i../src/third_party build
+  cd build
+
+  cppcheck --project=compile_commands.json -i../src/third_party .
 
   if [ "$(clang-tidy --version | sed -n 2p)" == "LLVM version 6.0.0" ]; then
-    run-clang-tidy-6.0.py -p build
+    run-clang-tidy-6.0.py -p .
   elif [ "$(clang-tidy --version | sed -n 2p)" == "LLVM version 7.0.1" ]; then
-    run-clang-tidy-7.py -p build
+    run-clang-tidy-7.py -p .
   elif [ "$(clang-tidy --version | sed -n 2p)" == "LLVM version 8.0.1" ]; then
-    run-clang-tidy-8.py -p build
+    run-clang-tidy-8.py -p .
   elif [ "$(clang-tidy --version | sed -n 2p)" == "LLVM version 9.0.1" ]; then
-    run-clang-tidy-9.py -p build
+    run-clang-tidy-9.py -p .
   elif [ "$(clang-tidy --version | sed -n 2p)" == "LLVM version 10.0.0" ]; then
-    run-clang-tidy-10.py -p build
+    run-clang-tidy-10.py -p .
   fi
 
   exit 0
