@@ -115,7 +115,7 @@ if [ "$1" == "--install" ]; then
         xvfb \
 	bear \
 	cppcheck \
-	clang-tidy-7
+	clang-tidy
   fi
   exit 0
 fi
@@ -157,7 +157,21 @@ if [ "$1" == "--build" ]; then
     j_opt="-j"
   fi
 
-  pushd build && qmake $config_opt .. && bear make $j_opt && cppcheck --project=compile_commands.json -i../../src/third_party . && python ../run-clang-tidy.py -p . && popd
+  pushd build && qmake $config_opt .. && bear make $j_opt && popd
+  
+  cppcheck --project=compile_commands.json -i../../src/third_party .
+
+  if [ $(clang-tidy --version | sed -n 2p) == "LLVM version 6.0.0" ]; then
+    run-clang-tidy-6.0.py -p .
+  elif [ $(clang-tidy --version | sed -n 2p) == "LLVM version 7.0.1" ]; then
+    run-clang-tidy-7.py -p .
+  elif [ $(clang-tidy --version | sed -n 2p) == "LLVM version 8.0.1" ]; then
+    run-clang-tidy-8.py -p .
+  elif [ $(clang-tidy --version | sed -n 2p) == "LLVM version 9.0.1" ]; then
+    run-clang-tidy-9.py -p .
+  elif [ $(clang-tidy --version | sed -n 2p) == "LLVM version 10.0.0" ]; then
+    run-clang-tidy-10.py -p .
+  fi
 
   exit 0
 fi
