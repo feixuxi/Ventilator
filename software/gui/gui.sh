@@ -158,7 +158,7 @@ if [ "$1" == "--build" ]; then
   fi
 
   pushd build && qmake $config_opt .. && bear make $j_opt && popd
-  
+
   cd build
 
   cppcheck --project=compile_commands.json -i../src/third_party .
