@@ -142,8 +142,7 @@ if [ "$1" == "--build" ]; then
     exit 1
   fi
 
-  curl https://raw.githubusercontent.com/llvm-mirror/clang-tools-extra/master/clang-tidy/tool/run-clang-tidy.py > run-clang-tidy.py
-  create_clean_directory build
+  7-create_clean_directory build
   qmake -unset QMAKEFEATURES
   git submodule update --init --recursive
 
