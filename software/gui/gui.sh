@@ -163,17 +163,11 @@ if [ "$1" == "--build" ]; then
 
   cppcheck --project=compile_commands.json -i../src/third_party .
 
-  CLANG_TIDY_VERSION=$(clang-tidy --version | sed -n 2p)
-  if [ "$CLANG_TIDY_VERSION" = "  LLVM version 6.0.0" ]; then
+  CLANG_TIDY_VERSION=$(grep -oP 'LLVM version \K.?' <<< "$(clang-tidy --version | sed -n 2p)")
+  if [ "$CLANG_TIDY_VERSION" = "6" ]; then
     run-clang-tidy-6.0.py -p .
-  elif [ "$CLANG_TIDY_VERSION" = "  LLVM version 7.0.1" ]; then
-    run-clang-tidy-7.py -p .
-  elif [ "$CLANG_TIDY_VERSION" = "  LLVM version 8.0.1" ]; then
-    run-clang-tidy-8.py -p .
-  elif [ "$CLANG_TIDY_VERSION" = "  LLVM version 9.0.1" ]; then
-    run-clang-tidy-9.py -p .
-  elif [ "$CLANG_TIDY_VERSION" = "  LLVM version 10.0.0" ]; then
-    run-clang-tidy-10.py -p .
+  else
+    eval "run-clang-tidy-${CLANG_TIDY_VERSION}.py"
   fi
 
   exit 0
