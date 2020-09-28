@@ -166,7 +166,7 @@ if [ "$1" == "--build" ]; then
 
   cd build
 
-  cppcheck --project=compile_commands.json -i ../../src/third_party .
+  cppcheck --project=compile_commands.json -i ../../src/third_party -i ../../../common/third_party .
 
   CLANG_TIDY_VERSION=$(grep -oP 'LLVM version \K.?' <<< "$(clang-tidy --version | sed -n 2p)")
   if [ "$CLANG_TIDY_VERSION" = "6" ]; then
