@@ -168,7 +168,7 @@ if [ "$1" == "--build" ]; then
 
   cppcheck --project=compile_commands.json -i ../../src/third_party -i ../../../common/third_party .
 
-  CLANG_TIDY_VERSION=$(grep -oP 'LLVM version \K.?' <<< "$(clang-tidy --version | sed -n 2p)")
+  CLANG_TIDY_VERSION=$(echo "$(clang-tidy --version | sed -n 2p)" | awk -F[" ".] '{print $5}')
   if [ "$CLANG_TIDY_VERSION" = "6" ]; then
     run-clang-tidy-6.0.py -p .
   else
