@@ -135,16 +135,22 @@ fi
 # BUILD #
 #########
 if [ "$1" == "--build" ]; then
-  cppcheck -ithird_party -ibuild .
 
   if [ "$EUID" -eq 0 ] && [ "$2" != "-f" ]; then
     echo "Please do not run build with root privileges!"
     exit 1
   fi
 
-  7-create_clean_directory build
+  create_clean_directory build
   qmake -unset QMAKEFEATURES
   git submodule update --init --recursive
+
+  if [ "$3" != "--no-checks" ]; then
+    set +e
+    set +o pipefail
+  fi
+
+  cppcheck -ithird_party -ibuild .
 
   config_opt="CONFIG+=release"
   if [ "$2" == "--debug" ] || [ "$3" == "--debug" ]; then
@@ -159,11 +165,6 @@ if [ "$1" == "--build" ]; then
   pushd build && qmake $config_opt .. && bear make $j_opt && popd
 
   cd build
-
-  if [ "$3" != "--no-checks" ]; then
-    set +e
-    set +o pipefail
-  fi
 
   cppcheck --project=compile_commands.json -i../src/third_party .
 
