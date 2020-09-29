@@ -145,7 +145,7 @@ if [ "$1" == "--build" ]; then
   qmake -unset QMAKEFEATURES
   git submodule update --init --recursive
 
-  if [ "$3" == "--no-checks" ]; then
+  if [ "$2" == "--no-checks" ] || [ "$3" == "--no-checks" ]; then
     set +e
     set +o pipefail
   fi
