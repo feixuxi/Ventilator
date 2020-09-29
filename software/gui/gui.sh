@@ -145,7 +145,7 @@ if [ "$1" == "--build" ]; then
   qmake -unset QMAKEFEATURES
   git submodule update --init --recursive
 
-  if [ "$2" == "--no-checks" ] || [ "$3" == "--no-checks" ]; then
+  if [ "$2" == "--no-checks" ] || [ "$3" == "--no-checks" ] || [ "$4" == "--no-checks" ] ;; then
     set +e
     set +o pipefail
   fi
@@ -153,12 +153,12 @@ if [ "$1" == "--build" ]; then
   cppcheck -ithird_party -ibuild .
 
   config_opt="CONFIG+=release"
-  if [ "$2" == "--debug" ] || [ "$3" == "--debug" ]; then
+  if [ "$2" == "--debug" ] || [ "$3" == "--debug" ] || [ "$4" == "--debug" ]; then
     config_opt="CONFIG+=debug"
   fi
 
   j_opt=""
-  if [ "$2" == "-j" ] || [ "$3" == "-j" ]; then
+  if [ "$2" == "-j" ] || [ "$3" == "-j" ] || [ "$4" == "-j" ]; then
     j_opt="-j"
   fi
 
