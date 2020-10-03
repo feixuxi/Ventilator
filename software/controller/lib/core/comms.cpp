@@ -128,7 +128,7 @@ static void process_tx(const ControllerStatus &controller_status) {
 
 static void process_rx(GuiStatus *gui_status) {
   while (Hal.serialBytesAvailableForRead() > 0) {
-    rx_in_progress{true};
+    rx_in_progress = true;
     char b;
     uint16_t bytes_read = Hal.serialRead(&b, 1);
     if (bytes_read == 1) {

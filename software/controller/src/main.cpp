@@ -48,7 +48,6 @@ static DebugFloat
 static Controller controller;
 static ControllerStatus controller_status;
 static Sensors sensors;
-static CommFailAlarm alarm;
 
 static SensorsProto AsSensorsProto(const SensorReadings &r,
                                    const ControllerState &c) {
