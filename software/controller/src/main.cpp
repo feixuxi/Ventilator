@@ -14,7 +14,6 @@ limitations under the License.
 */
 
 #include "actuators.h"
-#include "commfail_alarm.h"
 #include "comms.h"
 #include "controller.h"
 #include "debug.h"
@@ -153,8 +152,7 @@ static void background_loop() {
 
     comms_handler(local_controller_status, &gui_status);
 
-    alarm.Handler(Hal.now(), CommsGetLastRxTime()) ? Hal.BuzzerOn()
-                                                   : Hal.BuzzerOff();
+    comms_alarm_active() ? Hal.BuzzerOn() : Hal.BuzzerOff();
 
     // Override received gui_status from the RPi with values from DebugVars iff
     // the gui_mode DebugVar has a legal value.
@@ -190,8 +188,6 @@ int main() {
   NVparamsInit();
 
   comms_init();
-
-  alarm.Initialize(Hal.now());
 
   background_loop();
 }

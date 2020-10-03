@@ -1,3 +1,18 @@
+/* Copyright 2020, RespiraWorks
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 #include "comms.h"
 
 #include "algorithm.h"
@@ -16,10 +31,10 @@
 // beginning of the buffer.
 static uint8_t tx_buffer[ControllerStatus_size];
 // Index of the next byte to transmit.
-static uint16_t tx_idx = 0;
+static uint16_t tx_idx{0};
 // Number of bytes remaining to transmit. tx_idx + tx_bytes_remaining equals
 // the size of the serialized ControllerStatus proto.
-static uint16_t tx_bytes_remaining = 0;
+static uint16_t tx_bytes_remaining{0};
 
 // Time when we started sending the last ControllerStatus.
 static std::optional<Time> last_tx;
@@ -30,25 +45,32 @@ static std::optional<Time> last_tx;
 // Like tx_buffer, this isn't a circular buffer; the beginning of the proto is
 // always at the beginning of the buffer.
 static uint8_t rx_buffer[GuiStatus_size];
-static uint16_t rx_idx = 0;
-static Time last_rx = Hal.now();
-static bool rx_in_progress = false;
+static uint16_t rx_idx{0};
+static Time last_rx{Hal.now()};
+static bool rx_in_progress{false};
 
 // We currently lack proper message framing, so we use a timeout to determine
 // when the GUI is done sending us its message.
-static constexpr Duration RX_TIMEOUT = milliseconds(1);
+static constexpr Duration rx_timeout{milliseconds(1)};
 
-// We send a ControllerStatus every TX_INTERVAL_MS.
+// We send a ControllerStatus every tx_interval.
 
 // In Alpha build we use synchronized communication initiated by GUI cycle
 // controller. Since both ControllerStatus and GuiStatus take roughly 300+
 // bytes, we need at least 1/115200.*10*300=26ms to transmit.
-static constexpr Duration TX_INTERVAL = milliseconds(30);
+static constexpr Duration tx_interval{milliseconds(30)};
+
+// There should be a packet from GUI for every 30ms. If a packet is not
+// received periodically, then assuming something went wrong we wait for
+// 100ms (roughly 3 cycles) before raising a communication failure alarm
+static constexpr Duration kCommunicationTimeout{milliseconds(100)};
+
+static bool timeout_alarm_active{false};
 
 void comms_init() {}
 
 static bool is_time_to_process_packet() {
-  return Hal.now() - last_rx > RX_TIMEOUT;
+  return Hal.now() - last_rx > rx_timeout;
 }
 
 // NOTE this is work in progress.
@@ -71,7 +93,7 @@ static void process_tx(const ControllerStatus &controller_status) {
   //  - we can transmit at least one byte now, and
   //  - it's been a while since we last transmitted.
   if (tx_bytes_remaining == 0 &&
-      (last_tx == std::nullopt || Hal.now() - *last_tx > TX_INTERVAL)) {
+      (last_tx == std::nullopt || Hal.now() - *last_tx > tx_interval)) {
     // Serialize current status into output buffer.
     //
     // TODO: Frame the message bytes.
@@ -106,7 +128,7 @@ static void process_tx(const ControllerStatus &controller_status) {
 
 static void process_rx(GuiStatus *gui_status) {
   while (Hal.serialBytesAvailableForRead() > 0) {
-    rx_in_progress = true;
+    rx_in_progress{true};
     char b;
     uint16_t bytes_read = Hal.serialRead(&b, 1);
     if (bytes_read == 1) {
@@ -134,11 +156,25 @@ static void process_rx(GuiStatus *gui_status) {
   }
 }
 
+static void maybe_alarm() {
+  auto current_time = Hal.now();
+  if (current_time > last_rx) {
+    // has the communication timed out
+    if (current_time - last_rx > kCommunicationTimeout) {
+      // TODO(martukas): Log an error
+      timeout_alarm_active = true;
+    } else {
+      // TODO(martukas): Log recovery
+      timeout_alarm_active = false;
+    }
+  }
+}
+
 void comms_handler(const ControllerStatus &controller_status,
                    GuiStatus *gui_status) {
   process_tx(controller_status);
   process_rx(gui_status);
+  maybe_alarm();
 }
 
-// just return last rx time
-Time CommsGetLastRxTime() { return last_rx; }
+bool comms_alarm_active() { return timeout_alarm_active; }

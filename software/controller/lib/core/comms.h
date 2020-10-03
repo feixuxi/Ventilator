@@ -1,4 +1,4 @@
-/* Copyright 2020, Edwin Chiu
+/* Copyright 2020, RespiraWorks
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -32,6 +32,6 @@ void comms_init();
 void comms_handler(const ControllerStatus &controller_status,
                    GuiStatus *gui_status);
 
-Time CommsGetLastRxTime();
+bool comms_alarm_active();
 
 #endif // COMMS_H
