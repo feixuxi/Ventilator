@@ -67,3 +67,22 @@ We're planning to move the steppers driver onto the PCB. Because of this, there 
 ### RTC Battery
 
 We're planning to add an RTC battery, which will allow controller to keep track of time while off - Pizza build no change, this feature not available for now
+
+### CUSTOMIZED FITTINGS 
+
+We have designed some customized fittings to make the enclosed build more compact and also to make the assembly process easy
+
+**Mixing tank Manifold is designed in such a way that the Oxygen sensor and releif valve can be mounted directly on to the mixing tank.**
+
+![](assets/mixing_tank_manifold.png)
+
+[Manifold.](assets/mixing_tank_manifold.STL)
+
+**Some special adapters were also made in such a way that they can avoid the tube getting pinched at the bends.**
+
+![](assets/pinch_valve_to_venturi.png)
+![](assets/pinchvalve_to_exhale%20filter.png)
+
+[pinchvalve to venturi adapter.](assets/pinch_valve_to_venturi.STL)
+
+[pinchvalve to exhale filter.](assets/pinchvalve_to_exhale%20filter.STL)
